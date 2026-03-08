@@ -47,6 +47,40 @@ const SellerProducts = ({ products, userId, onRefresh }: Props) => {
 
   const lowStockProducts = products.filter(p => p.is_active && p.quantity_available <= lowStockThreshold);
 
+  const startBulkMode = () => {
+    const initial: Record<string, string> = {};
+    products.forEach(p => { initial[p.id] = String(p.quantity_available); });
+    setBulkUpdates(initial);
+    setBulkMode(true);
+  };
+
+  const cancelBulkMode = () => {
+    setBulkMode(false);
+    setBulkUpdates({});
+  };
+
+  const saveBulkUpdates = async () => {
+    setSavingBulk(true);
+    const updates = Object.entries(bulkUpdates).filter(
+      ([id, val]) => {
+        const product = products.find(p => p.id === id);
+        return product && Number(val) !== product.quantity_available;
+      }
+    );
+    if (updates.length === 0) { toast.info('No changes to save'); setSavingBulk(false); return; }
+    let failed = 0;
+    for (const [id, val] of updates) {
+      const { error } = await supabase.from('products').update({ quantity_available: Number(val) }).eq('id', id);
+      if (error) failed++;
+    }
+    setSavingBulk(false);
+    setBulkMode(false);
+    setBulkUpdates({});
+    if (failed) toast.error(`${failed} update(s) failed`);
+    else toast.success(`${updates.length} product(s) updated`);
+    onRefresh();
+  };
+
   const updateThreshold = (val: number) => {
     setLowStockThreshold(val);
     localStorage.setItem('lowStockThreshold', String(val));
