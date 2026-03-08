@@ -1,24 +1,76 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Search, SlidersHorizontal, Star } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import PriceTicker from '@/components/PriceTicker';
 import Footer from '@/components/Footer';
-import { products, type Product } from '@/data/products';
+import { products as staticProducts, type Product as StaticProduct } from '@/data/products';
+import { supabase } from '@/integrations/supabase/client';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 
+interface DBProduct {
+  id: string;
+  name: string;
+  name_local: string | null;
+  category: string;
+  image_url: string | null;
+  wholesale_price_min: number;
+  wholesale_price_max: number;
+  wholesale_unit: string;
+  retail_price_min: number;
+  retail_price_max: number;
+  retail_unit: string;
+  tags: string[];
+  is_active: boolean;
+  profiles: { full_name: string; village: string | null } | null;
+}
+
 const Products = () => {
   const [searchParams] = useSearchParams();
-  const initialCat = searchParams.get('cat') as Product['category'] | null;
+  const initialCat = searchParams.get('cat') || 'all';
 
   const [search, setSearch] = useState('');
-  const [category, setCategory] = useState<string>(initialCat || 'all');
+  const [category, setCategory] = useState(initialCat);
   const [priceSort, setPriceSort] = useState<'asc' | 'desc' | ''>('');
+  const [dbProducts, setDbProducts] = useState<DBProduct[]>([]);
+
+  useEffect(() => {
+    supabase
+      .from('products')
+      .select('*, profiles!products_seller_id_fkey(full_name, village)')
+      .eq('is_active', true)
+      .then(({ data }) => {
+        if (data) setDbProducts(data as unknown as DBProduct[]);
+      });
+  }, []);
+
+  // Merge static + DB products
+  const allProducts = useMemo(() => {
+    const fromDB = dbProducts.map(p => ({
+      id: p.id,
+      name: p.name,
+      nameLocal: p.name_local || '',
+      category: p.category as 'flowers' | 'vegetables',
+      image: p.image_url || 'https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?w=400&h=400&fit=crop',
+      wholesalePrice: { min: p.wholesale_price_min, max: p.wholesale_price_max, unit: p.wholesale_unit },
+      retailPrice: { min: p.retail_price_min, max: p.retail_price_max, unit: p.retail_unit },
+      vendor: p.profiles?.full_name || 'Local Vendor',
+      vendorLocation: p.profiles?.village || 'Anandapuram',
+      rating: 4.5,
+      tags: p.tags || [],
+      inStock: true,
+    }));
+
+    // Combine: DB products first, then static (filtering out duplicates by name)
+    const dbNames = new Set(fromDB.map(p => p.name.toLowerCase()));
+    const staticFiltered = staticProducts.filter(p => !dbNames.has(p.name.toLowerCase()));
+    return [...fromDB, ...staticFiltered];
+  }, [dbProducts]);
 
   const filtered = useMemo(() => {
-    let result = products;
+    let result = allProducts;
     if (category !== 'all') result = result.filter(p => p.category === category);
     if (search) result = result.filter(p =>
       p.name.toLowerCase().includes(search.toLowerCase()) ||
@@ -27,7 +79,7 @@ const Products = () => {
     if (priceSort === 'asc') result = [...result].sort((a, b) => a.wholesalePrice.min - b.wholesalePrice.min);
     if (priceSort === 'desc') result = [...result].sort((a, b) => b.wholesalePrice.min - a.wholesalePrice.min);
     return result;
-  }, [search, category, priceSort]);
+  }, [search, category, priceSort, allProducts]);
 
   return (
     <div className="min-h-screen bg-background">
@@ -35,47 +87,27 @@ const Products = () => {
       <Navbar />
 
       <div className="container mx-auto px-4 py-10">
-        <h1 className="text-3xl sm:text-4xl font-display font-bold text-foreground mb-2">
-          Browse Products
-        </h1>
+        <h1 className="text-3xl sm:text-4xl font-display font-bold text-foreground mb-2">Browse Products</h1>
         <p className="text-muted-foreground mb-8">Fresh flowers and produce from Anandapuram vendors</p>
 
-        {/* Filters */}
         <div className="flex flex-col sm:flex-row gap-4 mb-8">
           <div className="relative flex-1 max-w-md">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder="Search flowers, vegetables..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="pl-10"
-            />
+            <Input placeholder="Search flowers, vegetables..." value={search} onChange={(e) => setSearch(e.target.value)} className="pl-10" />
           </div>
           <div className="flex gap-2 flex-wrap">
             {['all', 'flowers', 'vegetables'].map(cat => (
-              <Button
-                key={cat}
-                variant={category === cat ? 'default' : 'outline'}
-                size="sm"
-                onClick={() => setCategory(cat)}
-                className="capitalize"
-              >
+              <Button key={cat} variant={category === cat ? 'default' : 'outline'} size="sm" onClick={() => setCategory(cat)} className="capitalize">
                 {cat === 'all' ? 'All' : cat}
               </Button>
             ))}
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setPriceSort(prev => prev === 'asc' ? 'desc' : prev === 'desc' ? '' : 'asc')}
-              className="gap-1"
-            >
+            <Button variant="ghost" size="sm" onClick={() => setPriceSort(prev => prev === 'asc' ? 'desc' : prev === 'desc' ? '' : 'asc')} className="gap-1">
               <SlidersHorizontal className="h-4 w-4" />
               Price {priceSort === 'asc' ? '↑' : priceSort === 'desc' ? '↓' : ''}
             </Button>
           </div>
         </div>
 
-        {/* Product grid */}
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {filtered.map(product => (
             <div key={product.id} className="bg-card rounded-xl overflow-hidden shadow-[var(--shadow-card)] hover:shadow-[var(--shadow-elevated)] transition-all duration-300 group">
