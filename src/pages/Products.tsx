@@ -162,7 +162,16 @@ const Products = () => {
               className="gap-1"
             >
               <Star className="h-4 w-4" />
-              {minRating > 0 ? `${minRating}+ Stars` : 'Rating'}
+              {minRating > 0 ? `${minRating}+ Stars` : 'Min Rating'}
+            </Button>
+            <Button
+              variant={ratingSort ? 'default' : 'ghost'}
+              size="sm"
+              onClick={() => setRatingSort(prev => !prev)}
+              className="gap-1"
+            >
+              <Star className="h-4 w-4" />
+              Top Rated {ratingSort ? '↓' : ''}
             </Button>
           </div>
         </div>
