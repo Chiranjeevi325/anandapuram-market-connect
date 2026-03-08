@@ -42,10 +42,11 @@ const Navbar = () => {
             </Link>
             {user ? (
               <>
-                <span className="text-sm text-muted-foreground">{profile?.full_name || user.email}</span>
+                <Link to="/orders"><Button variant="ghost" size="sm">Orders</Button></Link>
                 {profile?.role === 'seller' && (
                   <Link to="/seller"><Button variant="outline" size="sm">Dashboard</Button></Link>
                 )}
+                <span className="text-sm text-muted-foreground">{profile?.full_name || user.email}</span>
                 <Button variant="ghost" size="icon" onClick={signOut}><LogOut className="h-5 w-5" /></Button>
               </>
             ) : (
