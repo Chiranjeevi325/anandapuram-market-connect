@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { Star, ArrowRight, ShoppingCart, Check } from 'lucide-react';
+import { Star, ArrowRight, ShoppingCart, Check, Heart } from 'lucide-react';
 import { useState } from 'react';
 import { products } from '@/data/products';
 import { useCart } from '@/contexts/CartContext';
@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import { useScrollAnimation } from '@/hooks/useScrollAnimation';
+import { useWishlist } from '@/hooks/useWishlist';
 
 const FeaturedProducts = () => {
   const featured = products.filter(p => p.category === 'flowers').slice(0, 4);
@@ -14,6 +15,7 @@ const FeaturedProducts = () => {
   const [addedIds, setAddedIds] = useState<Set<string>>(new Set());
   const { ref: headerRef, isVisible: headerVisible } = useScrollAnimation();
   const { ref: gridRef, isVisible: gridVisible } = useScrollAnimation(0.1);
+  const { toggle: toggleWishlist, isWishlisted } = useWishlist();
 
   const handleAdd = (product: typeof featured[0]) => {
     addItem({
@@ -64,6 +66,12 @@ const FeaturedProducts = () => {
                       <Badge key={tag} className="bg-secondary text-secondary-foreground text-[10px] font-semibold">{tag}</Badge>
                     ))}
                   </div>
+                  <button
+                    onClick={(e) => { e.stopPropagation(); toggleWishlist(product.id); }}
+                    className="absolute top-3 right-3 h-8 w-8 rounded-full bg-card/80 backdrop-blur-sm flex items-center justify-center hover:bg-card transition-all duration-200 hover:scale-110"
+                  >
+                    <Heart className={`h-4 w-4 transition-colors duration-200 ${isWishlisted(product.id) ? 'fill-destructive text-destructive' : 'text-muted-foreground'}`} />
+                  </button>
                 </div>
                 <div className="p-4">
                   <div className="flex items-center justify-between mb-1">

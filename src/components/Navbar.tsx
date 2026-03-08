@@ -1,14 +1,16 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Menu, X, ShoppingCart, User, Flower2, LogOut } from 'lucide-react';
+import { Menu, X, ShoppingCart, User, Flower2, LogOut, Heart } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
 import { useCart } from '@/contexts/CartContext';
+import { useWishlist } from '@/hooks/useWishlist';
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const { user, profile, signOut } = useAuth();
   const { totalItems } = useCart();
+  const { totalWishlist } = useWishlist();
 
   return (
     <nav className="sticky top-0 z-50 bg-card/95 backdrop-blur-md border-b">
@@ -40,6 +42,16 @@ const Navbar = () => {
           </div>
 
           <div className="hidden md:flex items-center gap-3">
+            <Link to="/wishlist">
+              <Button variant="ghost" size="icon" className="relative hover:scale-105 transition-transform duration-200">
+                <Heart className="h-5 w-5" />
+                {totalWishlist > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-destructive text-destructive-foreground text-[10px] font-bold h-5 w-5 rounded-full flex items-center justify-center animate-[scale-in_0.3s_ease-out]">
+                    {totalWishlist}
+                  </span>
+                )}
+              </Button>
+            </Link>
             <Link to="/cart">
               <Button variant="ghost" size="icon" className="relative hover:scale-105 transition-transform duration-200">
                 <ShoppingCart className="h-5 w-5" />

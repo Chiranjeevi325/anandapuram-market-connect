@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
-import { Search, SlidersHorizontal, Star, ShoppingCart, Check } from 'lucide-react';
+import { Search, SlidersHorizontal, Star, ShoppingCart, Check, Heart } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import PriceTicker from '@/components/PriceTicker';
 import Footer from '@/components/Footer';
@@ -11,6 +11,7 @@ import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
+import { useWishlist } from '@/hooks/useWishlist';
 
 interface NormalizedProduct {
   id: string;
@@ -40,6 +41,7 @@ const Products = () => {
   const [dbProducts, setDbProducts] = useState<NormalizedProduct[]>([]);
   const [addedIds, setAddedIds] = useState<Set<string>>(new Set());
   const { addItem } = useCart();
+  const { toggle: toggleWishlist, isWishlisted } = useWishlist();
 
   useEffect(() => {
     const load = async () => {
@@ -192,6 +194,12 @@ const Products = () => {
                       <Badge key={tag} className="bg-secondary text-secondary-foreground text-[10px] font-semibold">{tag}</Badge>
                     ))}
                   </div>
+                  <button
+                    onClick={(e) => { e.stopPropagation(); toggleWishlist(product.id); }}
+                    className="absolute top-3 right-3 h-8 w-8 rounded-full bg-card/80 backdrop-blur-sm flex items-center justify-center hover:bg-card transition-all duration-200 hover:scale-110"
+                  >
+                    <Heart className={`h-4 w-4 transition-colors duration-200 ${isWishlisted(product.id) ? 'fill-destructive text-destructive' : 'text-muted-foreground'}`} />
+                  </button>
                 </div>
                 <div className="p-4">
                   <div className="flex items-center justify-between mb-1">
