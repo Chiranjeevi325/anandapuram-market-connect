@@ -152,6 +152,15 @@ const Products = () => {
               <SlidersHorizontal className="h-4 w-4" />
               Price {priceSort === 'asc' ? '↑' : priceSort === 'desc' ? '↓' : ''}
             </Button>
+            <Button
+              variant={minRating > 0 ? 'default' : 'ghost'}
+              size="sm"
+              onClick={() => setMinRating(prev => prev >= 4 ? 0 : prev + 1)}
+              className="gap-1"
+            >
+              <Star className="h-4 w-4" />
+              {minRating > 0 ? `${minRating}+ Stars` : 'Rating'}
+            </Button>
           </div>
         </div>
 
