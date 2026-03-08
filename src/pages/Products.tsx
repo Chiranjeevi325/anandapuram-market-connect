@@ -177,10 +177,14 @@ const Products = () => {
         </div>
 
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {filtered.map(product => {
+          {filtered.map((product, i) => {
             const justAdded = addedIds.has(product.id);
             return (
-              <div key={product.id} className="bg-card rounded-xl overflow-hidden shadow-[var(--shadow-card)] hover:shadow-[var(--shadow-elevated)] transition-all duration-300 group">
+              <div
+                key={product.id}
+                className="bg-card rounded-xl overflow-hidden shadow-[var(--shadow-card)] hover:shadow-[var(--shadow-elevated)] hover:-translate-y-1 transition-all duration-500 group animate-fade-in-up"
+                style={{ animationDelay: `${Math.min(i, 7) * 60}ms`, animationFillMode: 'both' }}
+              >
                 <div className="relative aspect-square overflow-hidden">
                   <img src={product.image} alt={product.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy" />
                   <div className="absolute top-3 left-3 flex gap-1.5">

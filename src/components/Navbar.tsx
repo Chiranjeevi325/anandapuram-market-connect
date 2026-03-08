@@ -14,8 +14,8 @@ const Navbar = () => {
     <nav className="sticky top-0 z-50 bg-card/95 backdrop-blur-md border-b">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
-          <Link to="/" className="flex items-center gap-2">
-            <Flower2 className="h-7 w-7 text-primary" />
+          <Link to="/" className="flex items-center gap-2 group">
+            <Flower2 className="h-7 w-7 text-primary group-hover:rotate-12 transition-transform duration-300" />
             <div>
               <span className="font-display text-lg font-bold text-foreground leading-none block">Anandapuram</span>
               <span className="text-[10px] font-body text-muted-foreground uppercase tracking-widest">Market</span>
@@ -23,18 +23,28 @@ const Navbar = () => {
           </Link>
 
           <div className="hidden md:flex items-center gap-8">
-            <Link to="/" className="text-sm font-medium text-foreground hover:text-primary transition-colors">Home</Link>
-            <Link to="/products" className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors">Browse</Link>
-            <Link to="/products?cat=flowers" className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors">Flowers</Link>
-            <Link to="/products?cat=vegetables" className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors">Vegetables</Link>
+            {[
+              { to: '/', label: 'Home' },
+              { to: '/products', label: 'Browse' },
+              { to: '/products?cat=flowers', label: 'Flowers' },
+              { to: '/products?cat=vegetables', label: 'Vegetables' },
+            ].map(link => (
+              <Link
+                key={link.label}
+                to={link.to}
+                className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors duration-200 relative after:absolute after:bottom-0 after:left-0 after:w-full after:h-0.5 after:bg-primary after:scale-x-0 hover:after:scale-x-100 after:transition-transform after:duration-300 after:origin-left"
+              >
+                {link.label}
+              </Link>
+            ))}
           </div>
 
           <div className="hidden md:flex items-center gap-3">
             <Link to="/cart">
-              <Button variant="ghost" size="icon" className="relative">
+              <Button variant="ghost" size="icon" className="relative hover:scale-105 transition-transform duration-200">
                 <ShoppingCart className="h-5 w-5" />
                 {totalItems > 0 && (
-                  <span className="absolute -top-1 -right-1 bg-accent text-accent-foreground text-[10px] font-bold h-5 w-5 rounded-full flex items-center justify-center">
+                  <span className="absolute -top-1 -right-1 bg-accent text-accent-foreground text-[10px] font-bold h-5 w-5 rounded-full flex items-center justify-center animate-[scale-in_0.3s_ease-out]">
                     {totalItems}
                   </span>
                 )}
@@ -67,18 +77,20 @@ const Navbar = () => {
                 )}
               </Button>
             </Link>
-            <button onClick={() => setIsOpen(!isOpen)}>
-              {isOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+            <button onClick={() => setIsOpen(!isOpen)} className="p-1">
+              <div className={`transition-transform duration-300 ${isOpen ? 'rotate-90' : ''}`}>
+                {isOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+              </div>
             </button>
           </div>
         </div>
 
-        {isOpen && (
-          <div className="md:hidden pb-4 space-y-2">
-            <Link to="/" className="block py-2 text-sm font-medium" onClick={() => setIsOpen(false)}>Home</Link>
-            <Link to="/products" className="block py-2 text-sm text-muted-foreground" onClick={() => setIsOpen(false)}>Browse All</Link>
-            <Link to="/products?cat=flowers" className="block py-2 text-sm text-muted-foreground" onClick={() => setIsOpen(false)}>Flowers</Link>
-            <Link to="/products?cat=vegetables" className="block py-2 text-sm text-muted-foreground" onClick={() => setIsOpen(false)}>Vegetables</Link>
+        <div className={`md:hidden overflow-hidden transition-all duration-300 ease-in-out ${isOpen ? 'max-h-96 opacity-100 pb-4' : 'max-h-0 opacity-0'}`}>
+          <div className="space-y-2">
+            <Link to="/" className="block py-2 text-sm font-medium hover:text-primary transition-colors" onClick={() => setIsOpen(false)}>Home</Link>
+            <Link to="/products" className="block py-2 text-sm text-muted-foreground hover:text-primary transition-colors" onClick={() => setIsOpen(false)}>Browse All</Link>
+            <Link to="/products?cat=flowers" className="block py-2 text-sm text-muted-foreground hover:text-primary transition-colors" onClick={() => setIsOpen(false)}>Flowers</Link>
+            <Link to="/products?cat=vegetables" className="block py-2 text-sm text-muted-foreground hover:text-primary transition-colors" onClick={() => setIsOpen(false)}>Vegetables</Link>
             <div className="pt-2">
               {user ? (
                 <div className="space-y-2">
@@ -100,7 +112,7 @@ const Navbar = () => {
               )}
             </div>
           </div>
-        )}
+        </div>
       </div>
     </nav>
   );

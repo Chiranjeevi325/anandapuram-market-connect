@@ -6,11 +6,14 @@ import { useCart } from '@/contexts/CartContext';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
+import { useScrollAnimation } from '@/hooks/useScrollAnimation';
 
 const FeaturedProducts = () => {
   const featured = products.filter(p => p.category === 'flowers').slice(0, 4);
   const { addItem } = useCart();
   const [addedIds, setAddedIds] = useState<Set<string>>(new Set());
+  const { ref: headerRef, isVisible: headerVisible } = useScrollAnimation();
+  const { ref: gridRef, isVisible: gridVisible } = useScrollAnimation(0.1);
 
   const handleAdd = (product: typeof featured[0]) => {
     addItem({
@@ -32,7 +35,10 @@ const FeaturedProducts = () => {
   return (
     <section className="py-20 bg-muted/50">
       <div className="container mx-auto px-4">
-        <div className="flex items-end justify-between mb-10">
+        <div
+          ref={headerRef}
+          className={`flex items-end justify-between mb-10 transition-all duration-700 ${headerVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}
+        >
           <div>
             <h2 className="text-3xl sm:text-4xl font-display font-bold text-foreground">Today's Fresh Picks</h2>
             <p className="text-muted-foreground mt-2">Hand-picked flowers from local farms</p>
@@ -42,13 +48,17 @@ const FeaturedProducts = () => {
           </Link>
         </div>
 
-        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {featured.map((product) => {
+        <div ref={gridRef} className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          {featured.map((product, i) => {
             const justAdded = addedIds.has(product.id);
             return (
-              <div key={product.id} className="bg-card rounded-xl overflow-hidden shadow-[var(--shadow-card)] hover:shadow-[var(--shadow-elevated)] transition-all duration-300 group">
+              <div
+                key={product.id}
+                className={`bg-card rounded-xl overflow-hidden shadow-[var(--shadow-card)] hover:shadow-[var(--shadow-elevated)] hover:-translate-y-1 transition-all duration-500 group ${gridVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'}`}
+                style={{ transitionDelay: gridVisible ? `${i * 100}ms` : '0ms' }}
+              >
                 <div className="relative aspect-square overflow-hidden">
-                  <img src={product.image} alt={product.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                  <img src={product.image} alt={product.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
                   <div className="absolute top-3 left-3 flex gap-1.5">
                     {product.tags.map(tag => (
                       <Badge key={tag} className="bg-secondary text-secondary-foreground text-[10px] font-semibold">{tag}</Badge>
