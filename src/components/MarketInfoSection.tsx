@@ -1,0 +1,54 @@
+import { Clock, MapPin, Truck, Phone } from 'lucide-react';
+
+const infoItems = [
+  {
+    icon: Clock,
+    title: 'Market Timing',
+    detail: '4:00 AM – 12:00 PM',
+    sub: 'Peak hours: 4 AM – 9 AM',
+  },
+  {
+    icon: MapPin,
+    title: 'Location',
+    detail: 'AH45 Highway Junction',
+    sub: 'Anandapuram, Visakhapatnam',
+  },
+  {
+    icon: Truck,
+    title: 'Pre-Order & Pickup',
+    detail: 'Order by 10 PM',
+    sub: 'Ready for 5:00 AM pickup',
+  },
+  {
+    icon: Phone,
+    title: 'Helpline',
+    detail: '+91 891 XXX XXXX',
+    sub: 'Available 3 AM – 1 PM',
+  },
+];
+
+const MarketInfoSection = () => {
+  return (
+    <section className="py-16 bg-leaf-light">
+      <div className="container mx-auto px-4">
+        <h2 className="text-3xl font-display font-bold text-center text-foreground mb-10">
+          Market Information
+        </h2>
+        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          {infoItems.map((item) => (
+            <div key={item.title} className="bg-card rounded-xl p-6 shadow-[var(--shadow-card)] text-center">
+              <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-primary/10 mb-4">
+                <item.icon className="h-6 w-6 text-primary" />
+              </div>
+              <h3 className="font-display font-bold text-foreground mb-1">{item.title}</h3>
+              <p className="text-lg font-semibold text-primary">{item.detail}</p>
+              <p className="text-sm text-muted-foreground mt-1">{item.sub}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+};
+
+export default MarketInfoSection;
