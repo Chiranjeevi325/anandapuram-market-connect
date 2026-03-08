@@ -76,6 +76,7 @@ const SellerDashboard = () => {
             <TabsTrigger value="products" className="gap-2"><Package className="h-4 w-4" /> Products</TabsTrigger>
             <TabsTrigger value="orders" className="gap-2"><ShoppingCart className="h-4 w-4" /> Orders</TabsTrigger>
             <TabsTrigger value="analytics" className="gap-2"><BarChart3 className="h-4 w-4" /> Analytics</TabsTrigger>
+            <TabsTrigger value="profile" className="gap-2"><UserCog className="h-4 w-4" /> Profile</TabsTrigger>
           </TabsList>
 
           <TabsContent value="products">
