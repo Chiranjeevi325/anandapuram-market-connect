@@ -66,7 +66,6 @@ const Orders = () => {
   }, [user]);
 
   const fetchOrders = async () => {
-    // Fetch orders, then separately fetch profiles
     const { data: ordersData, error } = await supabase
       .from('orders')
       .select('*, order_items(*, products(name, name_local, image_url))')
@@ -85,18 +84,24 @@ const Orders = () => {
       userIds.add(o.seller_id);
     });
 
-    const { data: profiles } = await supabase
-      .from('profiles')
-      .select('user_id, full_name, farm_name, phone')
-      .in('user_id', Array.from(userIds));
+    const orderIds = ordersData.map((o: any) => o.id);
+
+    const [{ data: profiles }, { data: reviews }] = await Promise.all([
+      supabase.from('profiles').select('user_id, full_name, farm_name, phone').in('user_id', Array.from(userIds)),
+      supabase.from('reviews' as any).select('order_id, rating, comment').in('order_id', orderIds),
+    ]);
 
     const profileMap = new Map<string, any>();
     profiles?.forEach(p => profileMap.set(p.user_id, p));
+
+    const reviewMap = new Map<string, any>();
+    (reviews as any[])?.forEach((r: any) => reviewMap.set(r.order_id, r));
 
     const enriched: Order[] = ordersData.map((o: any) => ({
       ...o,
       buyer_profile: profileMap.get(o.buyer_id) || null,
       seller_profile: profileMap.get(o.seller_id) || null,
+      review: reviewMap.get(o.id) || null,
     }));
 
     setOrders(enriched);
