@@ -261,6 +261,44 @@ const Orders = () => {
                       )}
                     </div>
                   )}
+
+                  {/* Review Section */}
+                  {order.status === 'delivered' && (
+                    <div className="px-5 py-3 border-t">
+                      {order.review ? (
+                        <div className="flex items-start gap-3">
+                          <Star className="h-4 w-4 text-marigold fill-marigold mt-0.5 shrink-0" />
+                          <div>
+                            <div className="flex items-center gap-2">
+                              <StarRating value={order.review.rating} readonly size="sm" />
+                              <span className="text-xs text-muted-foreground">{order.review.rating}/5</span>
+                            </div>
+                            {order.review.comment && (
+                              <p className="text-sm text-muted-foreground mt-1">"{order.review.comment}"</p>
+                            )}
+                          </div>
+                        </div>
+                      ) : !isSeller ? (
+                        reviewingOrderId === order.id ? (
+                          <ReviewForm
+                            orderId={order.id}
+                            sellerId={order.seller_id}
+                            onSubmitted={() => { setReviewingOrderId(null); fetchOrders(); }}
+                            onCancel={() => setReviewingOrderId(null)}
+                          />
+                        ) : (
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="gap-2"
+                            onClick={() => setReviewingOrderId(order.id)}
+                          >
+                            <Star className="h-4 w-4" /> Rate Seller
+                          </Button>
+                        )
+                      ) : null}
+                    </div>
+                  )}
                 </div>
               );
             })}
