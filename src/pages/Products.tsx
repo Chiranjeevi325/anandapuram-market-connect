@@ -36,6 +36,7 @@ const Products = () => {
   const [category, setCategory] = useState(initialCat);
   const [priceSort, setPriceSort] = useState<'asc' | 'desc' | ''>('');
   const [minRating, setMinRating] = useState(0);
+  const [ratingSort, setRatingSort] = useState(false);
   const [dbProducts, setDbProducts] = useState<NormalizedProduct[]>([]);
   const [addedIds, setAddedIds] = useState<Set<string>>(new Set());
   const { addItem } = useCart();
