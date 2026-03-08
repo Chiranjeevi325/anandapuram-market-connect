@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, Link } from 'react-router-dom';
 import { Search, SlidersHorizontal, Star, ShoppingCart, Check } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import PriceTicker from '@/components/PriceTicker';
@@ -154,7 +154,15 @@ const Products = () => {
                       <span className="text-xs font-medium text-muted-foreground">{product.rating}</span>
                     </div>
                   </div>
-                  <p className="text-xs text-muted-foreground mb-3">{product.nameLocal} • {product.vendor}, {product.vendorLocation}</p>
+                  <p className="text-xs text-muted-foreground mb-3">
+                    {product.nameLocal} •{' '}
+                    {product.sellerId !== 'static-seller' ? (
+                      <Link to={`/seller/${product.sellerId}`} className="text-primary hover:underline">{product.vendor}</Link>
+                    ) : (
+                      <span>{product.vendor}</span>
+                    )}
+                    , {product.vendorLocation}
+                  </p>
                   <div className="space-y-1 mb-4">
                     <div className="flex justify-between text-sm">
                       <span className="text-muted-foreground">Wholesale</span>
