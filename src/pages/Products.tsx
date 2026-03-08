@@ -187,7 +187,7 @@ const Products = () => {
                 className="bg-card rounded-xl overflow-hidden shadow-[var(--shadow-card)] hover:shadow-[var(--shadow-elevated)] hover:-translate-y-1 transition-all duration-500 group animate-fade-in-up"
                 style={{ animationDelay: `${Math.min(i, 7) * 60}ms`, animationFillMode: 'both' }}
               >
-                <div className="relative aspect-square overflow-hidden">
+                <Link to={`/product/${product.id}`} className="relative aspect-square overflow-hidden block">
                   <img src={product.image} alt={product.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy" />
                   <div className="absolute top-3 left-3 flex gap-1.5">
                     {product.tags.map(tag => (
@@ -195,12 +195,12 @@ const Products = () => {
                     ))}
                   </div>
                   <button
-                    onClick={(e) => { e.stopPropagation(); toggleWishlist(product.id); }}
+                    onClick={(e) => { e.preventDefault(); e.stopPropagation(); toggleWishlist(product.id); }}
                     className="absolute top-3 right-3 h-8 w-8 rounded-full bg-card/80 backdrop-blur-sm flex items-center justify-center hover:bg-card transition-all duration-200 hover:scale-110"
                   >
                     <Heart className={`h-4 w-4 transition-colors duration-200 ${isWishlisted(product.id) ? 'fill-destructive text-destructive' : 'text-muted-foreground'}`} />
                   </button>
-                </div>
+                </Link>
                 <div className="p-4">
                   <div className="flex items-center justify-between mb-1">
                     <h3 className="font-display font-bold text-foreground">{product.name}</h3>
