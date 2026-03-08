@@ -285,7 +285,9 @@ const SellerProducts = ({ products, userId, onRefresh }: Props) => {
                   <p className="text-sm text-muted-foreground">
                     W: ₹{p.wholesale_price_min}–₹{p.wholesale_price_max}/{p.wholesale_unit} •
                     R: ₹{p.retail_price_min}–₹{p.retail_price_max}/{p.retail_unit} •
-                    Stock: {p.quantity_available}
+                    Stock: <span className={p.is_active && p.quantity_available <= lowStockThreshold ? 'text-destructive font-semibold' : ''}>
+                      {p.quantity_available}{p.is_active && p.quantity_available <= lowStockThreshold ? ' ⚠' : ''}
+                    </span>
                   </p>
                 </div>
               </div>
