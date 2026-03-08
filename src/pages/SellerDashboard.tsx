@@ -90,6 +90,23 @@ const SellerDashboard = () => {
           <TabsContent value="analytics">
             <SellerAnalytics userId={user!.id} productCount={products.filter(p => p.is_active).length} />
           </TabsContent>
+
+          <TabsContent value="profile">
+            {profile && (
+              <SellerProfileEdit
+                userId={user!.id}
+                initialProfile={{
+                  full_name: profile.full_name,
+                  phone: (profile as any).phone || null,
+                  farm_name: profile.farm_name || null,
+                  village: profile.village || null,
+                  primary_product: (profile as any).primary_product || null,
+                  avatar_url: (profile as any).avatar_url || null,
+                }}
+                onUpdated={() => window.location.reload()}
+              />
+            )}
+          </TabsContent>
         </Tabs>
       </div>
 
