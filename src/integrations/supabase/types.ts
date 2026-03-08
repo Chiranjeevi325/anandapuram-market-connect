@@ -100,8 +100,10 @@ export type Database = {
       }
       products: {
         Row: {
+          additional_images: string[] | null
           category: string
           created_at: string
+          description: string | null
           id: string
           image_url: string | null
           is_active: boolean
@@ -119,8 +121,10 @@ export type Database = {
           wholesale_unit: string
         }
         Insert: {
+          additional_images?: string[] | null
           category: string
           created_at?: string
+          description?: string | null
           id?: string
           image_url?: string | null
           is_active?: boolean
@@ -138,8 +142,10 @@ export type Database = {
           wholesale_unit?: string
         }
         Update: {
+          additional_images?: string[] | null
           category?: string
           created_at?: string
+          description?: string | null
           id?: string
           image_url?: string | null
           is_active?: boolean
