@@ -7,8 +7,10 @@ import PriceTicker from '@/components/PriceTicker';
 import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Package, Clock, ArrowRight, Truck, MapPin, ShoppingBag } from 'lucide-react';
+import { Package, Clock, ArrowRight, Truck, MapPin, ShoppingBag, Star } from 'lucide-react';
 import { toast } from 'sonner';
+import StarRating from '@/components/StarRating';
+import ReviewForm from '@/components/ReviewForm';
 
 interface OrderItem {
   id: string;
@@ -33,6 +35,7 @@ interface Order {
   buyer_profile: { full_name: string; phone: string | null } | null;
   seller_profile: { full_name: string; farm_name: string | null; phone: string | null } | null;
   order_items: OrderItem[];
+  review: { rating: number; comment: string | null } | null;
 }
 
 const statusConfig: Record<string, { label: string; color: string; next?: string; nextLabel?: string }> = {
@@ -50,6 +53,7 @@ const Orders = () => {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [tab, setTab] = useState<'all' | 'pending' | 'active' | 'completed'>('all');
+  const [reviewingOrderId, setReviewingOrderId] = useState<string | null>(null);
 
   const isSeller = profile?.role === 'seller';
 
@@ -62,7 +66,6 @@ const Orders = () => {
   }, [user]);
 
   const fetchOrders = async () => {
-    // Fetch orders, then separately fetch profiles
     const { data: ordersData, error } = await supabase
       .from('orders')
       .select('*, order_items(*, products(name, name_local, image_url))')
@@ -81,18 +84,24 @@ const Orders = () => {
       userIds.add(o.seller_id);
     });
 
-    const { data: profiles } = await supabase
-      .from('profiles')
-      .select('user_id, full_name, farm_name, phone')
-      .in('user_id', Array.from(userIds));
+    const orderIds = ordersData.map((o: any) => o.id);
+
+    const [{ data: profiles }, { data: reviews }] = await Promise.all([
+      supabase.from('profiles').select('user_id, full_name, farm_name, phone').in('user_id', Array.from(userIds)),
+      supabase.from('reviews' as any).select('order_id, rating, comment').in('order_id', orderIds),
+    ]);
 
     const profileMap = new Map<string, any>();
     profiles?.forEach(p => profileMap.set(p.user_id, p));
+
+    const reviewMap = new Map<string, any>();
+    (reviews as any[])?.forEach((r: any) => reviewMap.set(r.order_id, r));
 
     const enriched: Order[] = ordersData.map((o: any) => ({
       ...o,
       buyer_profile: profileMap.get(o.buyer_id) || null,
       seller_profile: profileMap.get(o.seller_id) || null,
+      review: reviewMap.get(o.id) || null,
     }));
 
     setOrders(enriched);
@@ -250,6 +259,44 @@ const Orders = () => {
                           Cancel
                         </Button>
                       )}
+                    </div>
+                  )}
+
+                  {/* Review Section */}
+                  {order.status === 'delivered' && (
+                    <div className="px-5 py-3 border-t">
+                      {order.review ? (
+                        <div className="flex items-start gap-3">
+                          <Star className="h-4 w-4 text-marigold fill-marigold mt-0.5 shrink-0" />
+                          <div>
+                            <div className="flex items-center gap-2">
+                              <StarRating value={order.review.rating} readonly size="sm" />
+                              <span className="text-xs text-muted-foreground">{order.review.rating}/5</span>
+                            </div>
+                            {order.review.comment && (
+                              <p className="text-sm text-muted-foreground mt-1">"{order.review.comment}"</p>
+                            )}
+                          </div>
+                        </div>
+                      ) : !isSeller ? (
+                        reviewingOrderId === order.id ? (
+                          <ReviewForm
+                            orderId={order.id}
+                            sellerId={order.seller_id}
+                            onSubmitted={() => { setReviewingOrderId(null); fetchOrders(); }}
+                            onCancel={() => setReviewingOrderId(null)}
+                          />
+                        ) : (
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="gap-2"
+                            onClick={() => setReviewingOrderId(order.id)}
+                          >
+                            <Star className="h-4 w-4" /> Rate Seller
+                          </Button>
+                        )
+                      ) : null}
                     </div>
                   )}
                 </div>
