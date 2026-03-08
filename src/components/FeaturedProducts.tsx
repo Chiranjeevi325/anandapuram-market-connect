@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { Star, ArrowRight, ShoppingCart, Check } from 'lucide-react';
+import { Star, ArrowRight, ShoppingCart, Check, Heart } from 'lucide-react';
 import { useState } from 'react';
 import { products } from '@/data/products';
 import { useCart } from '@/contexts/CartContext';
