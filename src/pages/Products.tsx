@@ -35,6 +35,7 @@ const Products = () => {
   const [search, setSearch] = useState('');
   const [category, setCategory] = useState(initialCat);
   const [priceSort, setPriceSort] = useState<'asc' | 'desc' | ''>('');
+  const [minRating, setMinRating] = useState(0);
   const [dbProducts, setDbProducts] = useState<NormalizedProduct[]>([]);
   const [addedIds, setAddedIds] = useState<Set<string>>(new Set());
   const { addItem } = useCart();
@@ -101,10 +102,11 @@ const Products = () => {
       p.name.toLowerCase().includes(search.toLowerCase()) ||
       p.nameLocal.toLowerCase().includes(search.toLowerCase())
     );
+    if (minRating > 0) result = result.filter(p => p.rating >= minRating);
     if (priceSort === 'asc') result = [...result].sort((a, b) => a.wholesalePrice.min - b.wholesalePrice.min);
     if (priceSort === 'desc') result = [...result].sort((a, b) => b.wholesalePrice.min - a.wholesalePrice.min);
     return result;
-  }, [search, category, priceSort, allProducts]);
+  }, [search, category, priceSort, minRating, allProducts]);
 
   const handleAddToCart = (product: NormalizedProduct) => {
     addItem({
@@ -150,6 +152,15 @@ const Products = () => {
             <Button variant="ghost" size="sm" onClick={() => setPriceSort(prev => prev === 'asc' ? 'desc' : prev === 'desc' ? '' : 'asc')} className="gap-1">
               <SlidersHorizontal className="h-4 w-4" />
               Price {priceSort === 'asc' ? '↑' : priceSort === 'desc' ? '↓' : ''}
+            </Button>
+            <Button
+              variant={minRating > 0 ? 'default' : 'ghost'}
+              size="sm"
+              onClick={() => setMinRating(prev => prev >= 4 ? 0 : prev + 1)}
+              className="gap-1"
+            >
+              <Star className="h-4 w-4" />
+              {minRating > 0 ? `${minRating}+ Stars` : 'Rating'}
             </Button>
           </div>
         </div>
