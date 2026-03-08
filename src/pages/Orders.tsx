@@ -53,6 +53,7 @@ const Orders = () => {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [tab, setTab] = useState<'all' | 'pending' | 'active' | 'completed'>('all');
+  const [reviewingOrderId, setReviewingOrderId] = useState<string | null>(null);
 
   const isSeller = profile?.role === 'seller';
 
