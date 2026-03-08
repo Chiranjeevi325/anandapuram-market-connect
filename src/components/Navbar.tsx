@@ -3,10 +3,12 @@ import { Link } from 'react-router-dom';
 import { Menu, X, ShoppingCart, User, Flower2, LogOut } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
+import { useCart } from '@/contexts/CartContext';
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const { user, profile, signOut } = useAuth();
+  const { totalItems } = useCart();
 
   return (
     <nav className="sticky top-0 z-50 bg-card/95 backdrop-blur-md border-b">
@@ -28,17 +30,22 @@ const Navbar = () => {
           </div>
 
           <div className="hidden md:flex items-center gap-3">
+            <Link to="/cart">
+              <Button variant="ghost" size="icon" className="relative">
+                <ShoppingCart className="h-5 w-5" />
+                {totalItems > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-accent text-accent-foreground text-[10px] font-bold h-5 w-5 rounded-full flex items-center justify-center">
+                    {totalItems}
+                  </span>
+                )}
+              </Button>
+            </Link>
             {user ? (
               <>
-                <span className="text-sm text-muted-foreground">
-                  {profile?.full_name || user.email}
-                </span>
+                <span className="text-sm text-muted-foreground">{profile?.full_name || user.email}</span>
                 {profile?.role === 'seller' && (
-                  <Link to="/seller">
-                    <Button variant="outline" size="sm">Dashboard</Button>
-                  </Link>
+                  <Link to="/seller"><Button variant="outline" size="sm">Dashboard</Button></Link>
                 )}
-                <Button variant="ghost" size="icon"><ShoppingCart className="h-5 w-5" /></Button>
                 <Button variant="ghost" size="icon" onClick={signOut}><LogOut className="h-5 w-5" /></Button>
               </>
             ) : (
@@ -48,9 +55,21 @@ const Navbar = () => {
             )}
           </div>
 
-          <button className="md:hidden" onClick={() => setIsOpen(!isOpen)}>
-            {isOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-          </button>
+          <div className="flex md:hidden items-center gap-2">
+            <Link to="/cart">
+              <Button variant="ghost" size="icon" className="relative">
+                <ShoppingCart className="h-5 w-5" />
+                {totalItems > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-accent text-accent-foreground text-[10px] font-bold h-5 w-5 rounded-full flex items-center justify-center">
+                    {totalItems}
+                  </span>
+                )}
+              </Button>
+            </Link>
+            <button onClick={() => setIsOpen(!isOpen)}>
+              {isOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+            </button>
+          </div>
         </div>
 
         {isOpen && (
@@ -68,9 +87,7 @@ const Navbar = () => {
                       <Button variant="outline" size="sm" className="w-full">Seller Dashboard</Button>
                     </Link>
                   )}
-                  <Button variant="ghost" size="sm" className="w-full" onClick={() => { signOut(); setIsOpen(false); }}>
-                    Sign Out
-                  </Button>
+                  <Button variant="ghost" size="sm" className="w-full" onClick={() => { signOut(); setIsOpen(false); }}>Sign Out</Button>
                 </div>
               ) : (
                 <Link to="/auth" onClick={() => setIsOpen(false)}>
