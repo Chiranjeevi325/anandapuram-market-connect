@@ -41,6 +41,7 @@ const Products = () => {
   const [dbProducts, setDbProducts] = useState<NormalizedProduct[]>([]);
   const [addedIds, setAddedIds] = useState<Set<string>>(new Set());
   const { addItem } = useCart();
+  const { toggle: toggleWishlist, isWishlisted } = useWishlist();
 
   useEffect(() => {
     const load = async () => {
