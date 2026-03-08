@@ -15,6 +15,7 @@ const FeaturedProducts = () => {
   const [addedIds, setAddedIds] = useState<Set<string>>(new Set());
   const { ref: headerRef, isVisible: headerVisible } = useScrollAnimation();
   const { ref: gridRef, isVisible: gridVisible } = useScrollAnimation(0.1);
+  const { toggle: toggleWishlist, isWishlisted } = useWishlist();
 
   const handleAdd = (product: typeof featured[0]) => {
     addItem({
