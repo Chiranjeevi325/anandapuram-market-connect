@@ -80,7 +80,18 @@ const Navbar = () => {
             )}
           </div>
 
-          <div className="flex md:hidden items-center gap-2">
+          <div className="flex md:hidden items-center gap-1">
+            {user && <NotificationBell />}
+            <Link to="/wishlist">
+              <Button variant="ghost" size="icon" className="relative">
+                <Heart className="h-5 w-5" />
+                {totalWishlist > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-destructive text-destructive-foreground text-[10px] font-bold h-5 w-5 rounded-full flex items-center justify-center">
+                    {totalWishlist}
+                  </span>
+                )}
+              </Button>
+            </Link>
             <Link to="/cart">
               <Button variant="ghost" size="icon" className="relative">
                 <ShoppingCart className="h-5 w-5" />

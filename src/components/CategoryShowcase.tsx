@@ -48,7 +48,7 @@ const CategoryShowcase = () => {
               className={`group relative overflow-hidden rounded-2xl aspect-[4/3] shadow-[var(--shadow-card)] hover:shadow-[var(--shadow-elevated)] transition-all duration-500 ${gridVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'}`}
               style={{ transitionDelay: gridVisible ? `${i * 150}ms` : '0ms' }}
             >
-              <img src={cat.image} alt={cat.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
+              <img src={cat.image} alt={cat.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" loading="lazy" />
               <div className="absolute inset-0 bg-gradient-to-t from-foreground/80 via-foreground/30 to-transparent" />
               <div className="absolute bottom-0 left-0 right-0 p-6">
                 <span className="text-xs text-secondary font-medium uppercase tracking-wider">{cat.titleLocal}</span>
