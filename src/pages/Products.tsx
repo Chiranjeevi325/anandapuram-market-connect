@@ -36,6 +36,7 @@ const Products = () => {
   const [category, setCategory] = useState(initialCat);
   const [priceSort, setPriceSort] = useState<'asc' | 'desc' | ''>('');
   const [minRating, setMinRating] = useState(0);
+  const [ratingSort, setRatingSort] = useState(false);
   const [dbProducts, setDbProducts] = useState<NormalizedProduct[]>([]);
   const [addedIds, setAddedIds] = useState<Set<string>>(new Set());
   const { addItem } = useCart();
@@ -105,8 +106,9 @@ const Products = () => {
     if (minRating > 0) result = result.filter(p => p.rating >= minRating);
     if (priceSort === 'asc') result = [...result].sort((a, b) => a.wholesalePrice.min - b.wholesalePrice.min);
     if (priceSort === 'desc') result = [...result].sort((a, b) => b.wholesalePrice.min - a.wholesalePrice.min);
+    if (ratingSort) result = [...result].sort((a, b) => b.rating - a.rating);
     return result;
-  }, [search, category, priceSort, minRating, allProducts]);
+  }, [search, category, priceSort, minRating, ratingSort, allProducts]);
 
   const handleAddToCart = (product: NormalizedProduct) => {
     addItem({
@@ -160,7 +162,16 @@ const Products = () => {
               className="gap-1"
             >
               <Star className="h-4 w-4" />
-              {minRating > 0 ? `${minRating}+ Stars` : 'Rating'}
+              {minRating > 0 ? `${minRating}+ Stars` : 'Min Rating'}
+            </Button>
+            <Button
+              variant={ratingSort ? 'default' : 'ghost'}
+              size="sm"
+              onClick={() => setRatingSort(prev => !prev)}
+              className="gap-1"
+            >
+              <Star className="h-4 w-4" />
+              Top Rated {ratingSort ? '↓' : ''}
             </Button>
           </div>
         </div>
