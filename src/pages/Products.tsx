@@ -101,10 +101,11 @@ const Products = () => {
       p.name.toLowerCase().includes(search.toLowerCase()) ||
       p.nameLocal.toLowerCase().includes(search.toLowerCase())
     );
+    if (minRating > 0) result = result.filter(p => p.rating >= minRating);
     if (priceSort === 'asc') result = [...result].sort((a, b) => a.wholesalePrice.min - b.wholesalePrice.min);
     if (priceSort === 'desc') result = [...result].sort((a, b) => b.wholesalePrice.min - a.wholesalePrice.min);
     return result;
-  }, [search, category, priceSort, allProducts]);
+  }, [search, category, priceSort, minRating, allProducts]);
 
   const handleAddToCart = (product: NormalizedProduct) => {
     addItem({
