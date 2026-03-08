@@ -187,7 +187,7 @@ const Products = () => {
                 className="bg-card rounded-xl overflow-hidden shadow-[var(--shadow-card)] hover:shadow-[var(--shadow-elevated)] hover:-translate-y-1 transition-all duration-500 group animate-fade-in-up"
                 style={{ animationDelay: `${Math.min(i, 7) * 60}ms`, animationFillMode: 'both' }}
               >
-                <div className="relative aspect-square overflow-hidden">
+                <Link to={`/product/${product.id}`} className="relative aspect-square overflow-hidden block">
                   <img src={product.image} alt={product.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy" />
                   <div className="absolute top-3 left-3 flex gap-1.5">
                     {product.tags.map(tag => (
