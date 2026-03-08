@@ -35,7 +35,19 @@ interface Props {
 const SellerProducts = ({ products, userId, onRefresh }: Props) => {
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [lowStockThreshold, setLowStockThreshold] = useState(() => {
+    const saved = localStorage.getItem('lowStockThreshold');
+    return saved ? Number(saved) : 10;
+  });
+  const [showThresholdSetting, setShowThresholdSetting] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const lowStockProducts = products.filter(p => p.is_active && p.quantity_available <= lowStockThreshold);
+
+  const updateThreshold = (val: number) => {
+    setLowStockThreshold(val);
+    localStorage.setItem('lowStockThreshold', String(val));
+  };
 
   const [name, setName] = useState('');
   const [nameLocal, setNameLocal] = useState('');
