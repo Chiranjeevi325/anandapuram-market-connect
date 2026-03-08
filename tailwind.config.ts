@@ -47,6 +47,17 @@ export default {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
+        marigold: {
+          DEFAULT: "hsl(var(--marigold))",
+          foreground: "hsl(var(--marigold-foreground))",
+        },
+        jasmine: "hsl(var(--jasmine))",
+        leaf: {
+          DEFAULT: "hsl(var(--leaf))",
+          light: "hsl(var(--leaf-light))",
+        },
+        earth: "hsl(var(--earth))",
+        sunrise: "hsl(var(--sunrise))",
         sidebar: {
           DEFAULT: "hsl(var(--sidebar-background))",
           foreground: "hsl(var(--sidebar-foreground))",
