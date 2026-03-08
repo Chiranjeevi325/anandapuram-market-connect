@@ -6,10 +6,11 @@ import Navbar from '@/components/Navbar';
 import PriceTicker from '@/components/PriceTicker';
 import Footer from '@/components/Footer';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Package, ShoppingCart, BarChart3 } from 'lucide-react';
+import { Package, ShoppingCart, BarChart3, UserCog } from 'lucide-react';
 import SellerProducts from '@/components/seller/SellerProducts';
 import SellerOrders from '@/components/seller/SellerOrders';
 import SellerAnalytics from '@/components/seller/SellerAnalytics';
+import SellerProfileEdit from '@/components/seller/SellerProfileEdit';
 
 interface Product {
   id: string;
