@@ -106,8 +106,9 @@ const Products = () => {
     if (minRating > 0) result = result.filter(p => p.rating >= minRating);
     if (priceSort === 'asc') result = [...result].sort((a, b) => a.wholesalePrice.min - b.wholesalePrice.min);
     if (priceSort === 'desc') result = [...result].sort((a, b) => b.wholesalePrice.min - a.wholesalePrice.min);
+    if (ratingSort) result = [...result].sort((a, b) => b.rating - a.rating);
     return result;
-  }, [search, category, priceSort, minRating, allProducts]);
+  }, [search, category, priceSort, minRating, ratingSort, allProducts]);
 
   const handleAddToCart = (product: NormalizedProduct) => {
     addItem({
