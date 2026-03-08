@@ -4,8 +4,9 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
-import { Plus, Trash2, Upload, X, Image as ImageIcon, Edit2 } from 'lucide-react';
+import { Plus, Trash2, Upload, X, Image as ImageIcon, Edit2, AlertTriangle, Settings2 } from 'lucide-react';
 import { toast } from 'sonner';
+import { Card, CardContent } from '@/components/ui/card';
 
 interface Product {
   id: string;
@@ -34,7 +35,19 @@ interface Props {
 const SellerProducts = ({ products, userId, onRefresh }: Props) => {
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [lowStockThreshold, setLowStockThreshold] = useState(() => {
+    const saved = localStorage.getItem('lowStockThreshold');
+    return saved ? Number(saved) : 10;
+  });
+  const [showThresholdSetting, setShowThresholdSetting] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const lowStockProducts = products.filter(p => p.is_active && p.quantity_available <= lowStockThreshold);
+
+  const updateThreshold = (val: number) => {
+    setLowStockThreshold(val);
+    localStorage.setItem('lowStockThreshold', String(val));
+  };
 
   const [name, setName] = useState('');
   const [nameLocal, setNameLocal] = useState('');
@@ -149,15 +162,59 @@ const SellerProducts = ({ products, userId, onRefresh }: Props) => {
 
   return (
     <div>
+      {/* Low-stock alert banner */}
+      {lowStockProducts.length > 0 && (
+        <Card className="mb-6 border-destructive/30 bg-destructive/5">
+          <CardContent className="p-4">
+            <div className="flex items-start gap-3">
+              <AlertTriangle className="h-5 w-5 text-destructive mt-0.5 flex-shrink-0" />
+              <div className="flex-1">
+                <h3 className="font-semibold text-foreground text-sm">Low Stock Alert</h3>
+                <p className="text-xs text-muted-foreground mb-2">
+                  {lowStockProducts.length} product{lowStockProducts.length > 1 ? 's' : ''} below {lowStockThreshold} units
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {lowStockProducts.map(p => (
+                    <Badge key={p.id} variant="destructive" className="text-[11px] gap-1">
+                      {p.name}: {p.quantity_available} left
+                    </Badge>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       <div className="flex items-center justify-between mb-6">
         <div>
           <h2 className="text-xl font-display font-bold text-foreground">Products</h2>
           <p className="text-sm text-muted-foreground">{products.length} listed</p>
         </div>
-        <Button onClick={() => { resetForm(); setShowForm(!showForm); }} className="gap-2">
-          <Plus className="h-4 w-4" /> Add Product
-        </Button>
+        <div className="flex gap-2">
+          <Button variant="outline" size="sm" onClick={() => setShowThresholdSetting(!showThresholdSetting)} className="gap-1.5">
+            <Settings2 className="h-4 w-4" /> Stock Alert: {lowStockThreshold}
+          </Button>
+          <Button onClick={() => { resetForm(); setShowForm(!showForm); }} className="gap-2">
+            <Plus className="h-4 w-4" /> Add Product
+          </Button>
+        </div>
       </div>
+
+      {showThresholdSetting && (
+        <div className="bg-card rounded-xl p-4 shadow-[var(--shadow-card)] mb-6 flex items-center gap-4">
+          <Label className="text-sm whitespace-nowrap">Low stock threshold:</Label>
+          <Input
+            type="number"
+            min={1}
+            value={lowStockThreshold}
+            onChange={e => updateThreshold(Math.max(1, Number(e.target.value)))}
+            className="w-24"
+          />
+          <span className="text-sm text-muted-foreground">units</span>
+          <Button variant="ghost" size="sm" onClick={() => setShowThresholdSetting(false)}>Done</Button>
+        </div>
+      )}
 
       {showForm && (
         <form onSubmit={handleSubmit} className="bg-card rounded-xl p-6 shadow-[var(--shadow-card)] mb-8 grid sm:grid-cols-2 gap-4">
@@ -228,7 +285,9 @@ const SellerProducts = ({ products, userId, onRefresh }: Props) => {
                   <p className="text-sm text-muted-foreground">
                     W: ₹{p.wholesale_price_min}–₹{p.wholesale_price_max}/{p.wholesale_unit} •
                     R: ₹{p.retail_price_min}–₹{p.retail_price_max}/{p.retail_unit} •
-                    Stock: {p.quantity_available}
+                    Stock: <span className={p.is_active && p.quantity_available <= lowStockThreshold ? 'text-destructive font-semibold' : ''}>
+                      {p.quantity_available}{p.is_active && p.quantity_available <= lowStockThreshold ? ' ⚠' : ''}
+                    </span>
                   </p>
                 </div>
               </div>
