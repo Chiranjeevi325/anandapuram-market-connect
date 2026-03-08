@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Menu, X, ShoppingCart, User, Flower2, LogOut, Heart } from 'lucide-react';
+import NotificationBell from '@/components/NotificationBell';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
 import { useCart } from '@/contexts/CartContext';
@@ -64,6 +65,7 @@ const Navbar = () => {
             </Link>
             {user ? (
               <>
+                <NotificationBell />
                 <Link to="/orders"><Button variant="ghost" size="sm">Orders</Button></Link>
                 {profile?.role === 'seller' && (
                   <Link to="/seller"><Button variant="outline" size="sm">Dashboard</Button></Link>

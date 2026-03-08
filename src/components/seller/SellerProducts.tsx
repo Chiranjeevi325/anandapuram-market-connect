@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -38,12 +38,22 @@ const SellerProducts = ({ products, userId, onRefresh }: Props) => {
   const [bulkMode, setBulkMode] = useState(false);
   const [bulkUpdates, setBulkUpdates] = useState<Record<string, string>>({});
   const [savingBulk, setSavingBulk] = useState(false);
-  const [lowStockThreshold, setLowStockThreshold] = useState(() => {
-    const saved = localStorage.getItem('lowStockThreshold');
-    return saved ? Number(saved) : 10;
-  });
+  const [lowStockThreshold, setLowStockThreshold] = useState(10);
   const [showThresholdSetting, setShowThresholdSetting] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Load threshold from DB
+  useEffect(() => {
+    const load = async () => {
+      const { data } = await supabase
+        .from('seller_settings')
+        .select('low_stock_threshold')
+        .eq('user_id', userId)
+        .maybeSingle();
+      if (data) setLowStockThreshold(data.low_stock_threshold);
+    };
+    load();
+  }, [userId]);
 
   const lowStockProducts = products.filter(p => p.is_active && p.quantity_available <= lowStockThreshold);
 
@@ -81,9 +91,13 @@ const SellerProducts = ({ products, userId, onRefresh }: Props) => {
     onRefresh();
   };
 
-  const updateThreshold = (val: number) => {
+  const updateThreshold = async (val: number) => {
     setLowStockThreshold(val);
-    localStorage.setItem('lowStockThreshold', String(val));
+    // Upsert to DB so the trigger uses the same threshold
+    await supabase.from('seller_settings').upsert(
+      { user_id: userId, low_stock_threshold: val },
+      { onConflict: 'user_id' }
+    );
   };
 
   const [name, setName] = useState('');
