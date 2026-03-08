@@ -10,6 +10,7 @@ const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const { user, profile, signOut } = useAuth();
   const { totalItems } = useCart();
+  const { totalWishlist } = useWishlist();
 
   return (
     <nav className="sticky top-0 z-50 bg-card/95 backdrop-blur-md border-b">
