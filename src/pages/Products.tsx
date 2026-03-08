@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
-import { Search, SlidersHorizontal, Star, ShoppingCart, Check, Heart } from 'lucide-react';
+import { SlidersHorizontal, Star, ShoppingCart, Check, Heart } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import PriceTicker from '@/components/PriceTicker';
 import Footer from '@/components/Footer';
