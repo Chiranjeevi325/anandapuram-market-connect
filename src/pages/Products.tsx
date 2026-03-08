@@ -9,6 +9,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useCart } from '@/contexts/CartContext';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
+import SearchSuggestions from '@/components/SearchSuggestions';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import { useWishlist } from '@/hooks/useWishlist';
