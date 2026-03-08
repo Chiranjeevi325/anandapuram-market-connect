@@ -11,6 +11,7 @@ import SellerProducts from '@/components/seller/SellerProducts';
 import SellerOrders from '@/components/seller/SellerOrders';
 import SellerAnalytics from '@/components/seller/SellerAnalytics';
 import SellerProfileEdit from '@/components/seller/SellerProfileEdit';
+import NotificationPreferences from '@/components/seller/NotificationPreferences';
 
 interface Product {
   id: string;
