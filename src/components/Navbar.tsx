@@ -65,6 +65,7 @@ const Navbar = () => {
             </Link>
             {user ? (
               <>
+                <NotificationBell />
                 <Link to="/orders"><Button variant="ghost" size="sm">Orders</Button></Link>
                 {profile?.role === 'seller' && (
                   <Link to="/seller"><Button variant="outline" size="sm">Dashboard</Button></Link>
