@@ -35,6 +35,9 @@ interface Props {
 const SellerProducts = ({ products, userId, onRefresh }: Props) => {
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [bulkMode, setBulkMode] = useState(false);
+  const [bulkUpdates, setBulkUpdates] = useState<Record<string, string>>({});
+  const [savingBulk, setSavingBulk] = useState(false);
   const [lowStockThreshold, setLowStockThreshold] = useState(() => {
     const saved = localStorage.getItem('lowStockThreshold');
     return saved ? Number(saved) : 10;
