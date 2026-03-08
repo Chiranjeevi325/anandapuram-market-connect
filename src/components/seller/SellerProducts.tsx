@@ -332,12 +332,26 @@ const SellerProducts = ({ products, userId, onRefresh }: Props) => {
                       {p.is_active ? 'Active' : 'Inactive'}
                     </Badge>
                   </div>
-                  <p className="text-sm text-muted-foreground">
+                   <p className="text-sm text-muted-foreground">
                     W: ₹{p.wholesale_price_min}–₹{p.wholesale_price_max}/{p.wholesale_unit} •
                     R: ₹{p.retail_price_min}–₹{p.retail_price_max}/{p.retail_unit} •
-                    Stock: <span className={p.is_active && p.quantity_available <= lowStockThreshold ? 'text-destructive font-semibold' : ''}>
-                      {p.quantity_available}{p.is_active && p.quantity_available <= lowStockThreshold ? ' ⚠' : ''}
-                    </span>
+                    {bulkMode ? (
+                      <span className="inline-flex items-center gap-1.5 ml-1">
+                        Stock: <Input
+                          type="number"
+                          min={0}
+                          value={bulkUpdates[p.id] ?? String(p.quantity_available)}
+                          onChange={e => setBulkUpdates(prev => ({ ...prev, [p.id]: e.target.value }))}
+                          className="w-20 h-7 text-xs inline-block"
+                        />
+                      </span>
+                    ) : (
+                      <>
+                        Stock: <span className={p.is_active && p.quantity_available <= lowStockThreshold ? 'text-destructive font-semibold' : ''}>
+                          {p.quantity_available}{p.is_active && p.quantity_available <= lowStockThreshold ? ' ⚠' : ''}
+                        </span>
+                      </>
+                    )}
                   </p>
                 </div>
               </div>
