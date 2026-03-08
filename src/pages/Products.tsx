@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, Link } from 'react-router-dom';
 import { Search, SlidersHorizontal, Star, ShoppingCart, Check } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import PriceTicker from '@/components/PriceTicker';
