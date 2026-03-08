@@ -200,7 +200,7 @@ const Products = () => {
                   >
                     <Heart className={`h-4 w-4 transition-colors duration-200 ${isWishlisted(product.id) ? 'fill-destructive text-destructive' : 'text-muted-foreground'}`} />
                   </button>
-                </div>
+                </Link>
                 <div className="p-4">
                   <div className="flex items-center justify-between mb-1">
                     <h3 className="font-display font-bold text-foreground">{product.name}</h3>
