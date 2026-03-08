@@ -53,6 +53,8 @@
     --leaf-light: 142 40% 92%;
     --earth: 25 30% 35%;
     --sunrise: 16 80% 55%;
+    --gold: 38 85% 50%;
+    --gold-foreground: 38 90% 12%;
 
     --gradient-hero: linear-gradient(135deg, hsl(142 54% 30%), hsl(142 40% 22%));
     --gradient-marigold: linear-gradient(135deg, hsl(38 92% 55%), hsl(25 85% 50%));
