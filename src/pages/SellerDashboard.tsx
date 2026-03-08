@@ -11,6 +11,7 @@ import SellerProducts from '@/components/seller/SellerProducts';
 import SellerOrders from '@/components/seller/SellerOrders';
 import SellerAnalytics from '@/components/seller/SellerAnalytics';
 import SellerProfileEdit from '@/components/seller/SellerProfileEdit';
+import NotificationPreferences from '@/components/seller/NotificationPreferences';
 
 interface Product {
   id: string;
@@ -91,7 +92,7 @@ const SellerDashboard = () => {
             <SellerAnalytics userId={user!.id} productCount={products.filter(p => p.is_active).length} />
           </TabsContent>
 
-          <TabsContent value="profile">
+          <TabsContent value="profile" className="space-y-6">
             {profile && (
               <SellerProfileEdit
                 userId={user!.id}
@@ -106,6 +107,7 @@ const SellerDashboard = () => {
                 onUpdated={() => window.location.reload()}
               />
             )}
+            <NotificationPreferences userId={user!.id} />
           </TabsContent>
         </Tabs>
       </div>
