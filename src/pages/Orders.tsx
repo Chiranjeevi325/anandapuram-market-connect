@@ -35,6 +35,7 @@ interface Order {
   buyer_profile: { full_name: string; phone: string | null } | null;
   seller_profile: { full_name: string; farm_name: string | null; phone: string | null } | null;
   order_items: OrderItem[];
+  review: { rating: number; comment: string | null } | null;
 }
 
 const statusConfig: Record<string, { label: string; color: string; next?: string; nextLabel?: string }> = {
