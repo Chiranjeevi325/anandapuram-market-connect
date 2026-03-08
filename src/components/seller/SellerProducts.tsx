@@ -162,15 +162,59 @@ const SellerProducts = ({ products, userId, onRefresh }: Props) => {
 
   return (
     <div>
+      {/* Low-stock alert banner */}
+      {lowStockProducts.length > 0 && (
+        <Card className="mb-6 border-destructive/30 bg-destructive/5">
+          <CardContent className="p-4">
+            <div className="flex items-start gap-3">
+              <AlertTriangle className="h-5 w-5 text-destructive mt-0.5 flex-shrink-0" />
+              <div className="flex-1">
+                <h3 className="font-semibold text-foreground text-sm">Low Stock Alert</h3>
+                <p className="text-xs text-muted-foreground mb-2">
+                  {lowStockProducts.length} product{lowStockProducts.length > 1 ? 's' : ''} below {lowStockThreshold} units
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {lowStockProducts.map(p => (
+                    <Badge key={p.id} variant="destructive" className="text-[11px] gap-1">
+                      {p.name}: {p.quantity_available} left
+                    </Badge>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       <div className="flex items-center justify-between mb-6">
         <div>
           <h2 className="text-xl font-display font-bold text-foreground">Products</h2>
           <p className="text-sm text-muted-foreground">{products.length} listed</p>
         </div>
-        <Button onClick={() => { resetForm(); setShowForm(!showForm); }} className="gap-2">
-          <Plus className="h-4 w-4" /> Add Product
-        </Button>
+        <div className="flex gap-2">
+          <Button variant="outline" size="sm" onClick={() => setShowThresholdSetting(!showThresholdSetting)} className="gap-1.5">
+            <Settings2 className="h-4 w-4" /> Stock Alert: {lowStockThreshold}
+          </Button>
+          <Button onClick={() => { resetForm(); setShowForm(!showForm); }} className="gap-2">
+            <Plus className="h-4 w-4" /> Add Product
+          </Button>
+        </div>
       </div>
+
+      {showThresholdSetting && (
+        <div className="bg-card rounded-xl p-4 shadow-[var(--shadow-card)] mb-6 flex items-center gap-4">
+          <Label className="text-sm whitespace-nowrap">Low stock threshold:</Label>
+          <Input
+            type="number"
+            min={1}
+            value={lowStockThreshold}
+            onChange={e => updateThreshold(Math.max(1, Number(e.target.value)))}
+            className="w-24"
+          />
+          <span className="text-sm text-muted-foreground">units</span>
+          <Button variant="ghost" size="sm" onClick={() => setShowThresholdSetting(false)}>Done</Button>
+        </div>
+      )}
 
       {showForm && (
         <form onSubmit={handleSubmit} className="bg-card rounded-xl p-6 shadow-[var(--shadow-card)] mb-8 grid sm:grid-cols-2 gap-4">
