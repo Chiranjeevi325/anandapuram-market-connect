@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import { useScrollAnimation } from '@/hooks/useScrollAnimation';
+import { useWishlist } from '@/hooks/useWishlist';
 
 const FeaturedProducts = () => {
   const featured = products.filter(p => p.category === 'flowers').slice(0, 4);
