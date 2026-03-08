@@ -58,6 +58,10 @@ export default {
         },
         earth: "hsl(var(--earth))",
         sunrise: "hsl(var(--sunrise))",
+        gold: {
+          DEFAULT: "hsl(var(--gold))",
+          foreground: "hsl(var(--gold-foreground))",
+        },
         sidebar: {
           DEFAULT: "hsl(var(--sidebar-background))",
           foreground: "hsl(var(--sidebar-foreground))",

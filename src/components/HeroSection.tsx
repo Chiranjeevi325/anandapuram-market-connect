@@ -38,7 +38,7 @@ const HeroSection = () => {
               </Button>
             </Link>
             <Link to="/products">
-              <Button size="lg" className="bg-amber-500 text-amber-950 hover:bg-amber-400 border-none text-base px-8 font-semibold">
+              <Button size="lg" className="bg-gold text-gold-foreground hover:bg-gold/90 border-none text-base px-8 font-semibold">
                 Pre-Order for 5 AM
               </Button>
             </Link>
