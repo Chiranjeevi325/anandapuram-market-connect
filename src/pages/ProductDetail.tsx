@@ -262,7 +262,7 @@ const ProductDetailPage = () => {
               <div className="flex items-center gap-3">
                 {product.rating > 0 && (
                   <div className="flex items-center gap-1.5">
-                    <StarRating rating={product.rating} />
+                    <StarRating value={product.rating} readonly size="sm" />
                     <span className="text-sm font-medium text-muted-foreground">{product.rating}</span>
                     {reviews.length > 0 && (
                       <span className="text-sm text-muted-foreground">({reviews.length} reviews)</span>
