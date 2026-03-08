@@ -290,6 +290,11 @@ export type Database = {
           created_at: string
           id: string
           low_stock_threshold: number
+          notify_email: boolean
+          notify_in_app: boolean
+          notify_low_stock: boolean
+          notify_new_order: boolean
+          notify_order_status: boolean
           updated_at: string
           user_id: string
         }
@@ -297,6 +302,11 @@ export type Database = {
           created_at?: string
           id?: string
           low_stock_threshold?: number
+          notify_email?: boolean
+          notify_in_app?: boolean
+          notify_low_stock?: boolean
+          notify_new_order?: boolean
+          notify_order_status?: boolean
           updated_at?: string
           user_id: string
         }
@@ -304,6 +314,11 @@ export type Database = {
           created_at?: string
           id?: string
           low_stock_threshold?: number
+          notify_email?: boolean
+          notify_in_app?: boolean
+          notify_low_stock?: boolean
+          notify_new_order?: boolean
+          notify_order_status?: boolean
           updated_at?: string
           user_id?: string
         }
