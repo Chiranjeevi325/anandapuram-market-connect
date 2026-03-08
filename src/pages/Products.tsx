@@ -170,10 +170,12 @@ const Products = () => {
                 <div className="p-4">
                   <div className="flex items-center justify-between mb-1">
                     <h3 className="font-display font-bold text-foreground">{product.name}</h3>
-                    <div className="flex items-center gap-1">
-                      <Star className="h-3.5 w-3.5 fill-secondary text-secondary" />
-                      <span className="text-xs font-medium text-muted-foreground">{product.rating}</span>
-                    </div>
+                    {product.rating > 0 && (
+                      <div className="flex items-center gap-1">
+                        <Star className="h-3.5 w-3.5 fill-secondary text-secondary" />
+                        <span className="text-xs font-medium text-muted-foreground">{product.rating}</span>
+                      </div>
+                    )}
                   </div>
                   <p className="text-xs text-muted-foreground mb-3">
                     {product.nameLocal} •{' '}
