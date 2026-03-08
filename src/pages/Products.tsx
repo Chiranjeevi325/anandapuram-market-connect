@@ -40,29 +40,50 @@ const Products = () => {
   const { addItem } = useCart();
 
   useEffect(() => {
-    supabase
-      .from('products')
-      .select('*, profiles!products_seller_id_fkey(full_name, village)')
-      .eq('is_active', true)
-      .then(({ data }) => {
-        if (data) {
-          setDbProducts(data.map((p: any) => ({
-            id: p.id,
-            name: p.name,
-            nameLocal: p.name_local || '',
-            category: p.category,
-            image: p.image_url || 'https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?w=400&h=400&fit=crop',
-            wholesalePrice: { min: p.wholesale_price_min, max: p.wholesale_price_max, unit: p.wholesale_unit },
-            retailPrice: { min: p.retail_price_min, max: p.retail_price_max, unit: p.retail_unit },
-            vendor: p.profiles?.full_name || 'Local Vendor',
-            vendorLocation: p.profiles?.village || 'Anandapuram',
-            rating: 4.5,
-            tags: p.tags || [],
-            inStock: true,
-            sellerId: p.seller_id,
-          })));
-        }
+    const load = async () => {
+      const { data: productsData } = await supabase
+        .from('products')
+        .select('*, profiles!products_seller_id_fkey(full_name, village)')
+        .eq('is_active', true);
+
+      if (!productsData) return;
+
+      // Fetch all reviews to compute avg ratings per seller
+      const sellerIds = [...new Set(productsData.map((p: any) => p.seller_id))];
+      const { data: reviewsData } = await supabase
+        .from('reviews')
+        .select('seller_id, rating')
+        .in('seller_id', sellerIds);
+
+      const ratingMap = new Map<string, { sum: number; count: number }>();
+      reviewsData?.forEach((r: any) => {
+        const entry = ratingMap.get(r.seller_id) || { sum: 0, count: 0 };
+        entry.sum += r.rating;
+        entry.count += 1;
+        ratingMap.set(r.seller_id, entry);
       });
+
+      setDbProducts(productsData.map((p: any) => {
+        const entry = ratingMap.get(p.seller_id);
+        const avg = entry ? entry.sum / entry.count : 0;
+        return {
+          id: p.id,
+          name: p.name,
+          nameLocal: p.name_local || '',
+          category: p.category,
+          image: p.image_url || 'https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?w=400&h=400&fit=crop',
+          wholesalePrice: { min: p.wholesale_price_min, max: p.wholesale_price_max, unit: p.wholesale_unit },
+          retailPrice: { min: p.retail_price_min, max: p.retail_price_max, unit: p.retail_unit },
+          vendor: p.profiles?.full_name || 'Local Vendor',
+          vendorLocation: p.profiles?.village || 'Anandapuram',
+          rating: Math.round(avg * 10) / 10,
+          tags: p.tags || [],
+          inStock: true,
+          sellerId: p.seller_id,
+        };
+      }));
+    };
+    load();
   }, []);
 
   const allProducts: NormalizedProduct[] = useMemo(() => {
