@@ -6,10 +6,11 @@ import Navbar from '@/components/Navbar';
 import PriceTicker from '@/components/PriceTicker';
 import Footer from '@/components/Footer';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Package, ShoppingCart, BarChart3 } from 'lucide-react';
+import { Package, ShoppingCart, BarChart3, UserCog } from 'lucide-react';
 import SellerProducts from '@/components/seller/SellerProducts';
 import SellerOrders from '@/components/seller/SellerOrders';
 import SellerAnalytics from '@/components/seller/SellerAnalytics';
+import SellerProfileEdit from '@/components/seller/SellerProfileEdit';
 
 interface Product {
   id: string;
@@ -75,6 +76,7 @@ const SellerDashboard = () => {
             <TabsTrigger value="products" className="gap-2"><Package className="h-4 w-4" /> Products</TabsTrigger>
             <TabsTrigger value="orders" className="gap-2"><ShoppingCart className="h-4 w-4" /> Orders</TabsTrigger>
             <TabsTrigger value="analytics" className="gap-2"><BarChart3 className="h-4 w-4" /> Analytics</TabsTrigger>
+            <TabsTrigger value="profile" className="gap-2"><UserCog className="h-4 w-4" /> Profile</TabsTrigger>
           </TabsList>
 
           <TabsContent value="products">
@@ -87,6 +89,23 @@ const SellerDashboard = () => {
 
           <TabsContent value="analytics">
             <SellerAnalytics userId={user!.id} productCount={products.filter(p => p.is_active).length} />
+          </TabsContent>
+
+          <TabsContent value="profile">
+            {profile && (
+              <SellerProfileEdit
+                userId={user!.id}
+                initialProfile={{
+                  full_name: profile.full_name,
+                  phone: (profile as any).phone || null,
+                  farm_name: profile.farm_name || null,
+                  village: profile.village || null,
+                  primary_product: (profile as any).primary_product || null,
+                  avatar_url: (profile as any).avatar_url || null,
+                }}
+                onUpdated={() => window.location.reload()}
+              />
+            )}
           </TabsContent>
         </Tabs>
       </div>
