@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
-import { Plus, Trash2, Upload, X, Image as ImageIcon, Edit2, AlertTriangle, Settings2 } from 'lucide-react';
+import { Plus, Trash2, Upload, X, Image as ImageIcon, Edit2, AlertTriangle, Settings2, ListChecks, Save } from 'lucide-react';
 import { toast } from 'sonner';
 import { Card, CardContent } from '@/components/ui/card';
 
@@ -35,6 +35,9 @@ interface Props {
 const SellerProducts = ({ products, userId, onRefresh }: Props) => {
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [bulkMode, setBulkMode] = useState(false);
+  const [bulkUpdates, setBulkUpdates] = useState<Record<string, string>>({});
+  const [savingBulk, setSavingBulk] = useState(false);
   const [lowStockThreshold, setLowStockThreshold] = useState(() => {
     const saved = localStorage.getItem('lowStockThreshold');
     return saved ? Number(saved) : 10;
@@ -43,6 +46,40 @@ const SellerProducts = ({ products, userId, onRefresh }: Props) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const lowStockProducts = products.filter(p => p.is_active && p.quantity_available <= lowStockThreshold);
+
+  const startBulkMode = () => {
+    const initial: Record<string, string> = {};
+    products.forEach(p => { initial[p.id] = String(p.quantity_available); });
+    setBulkUpdates(initial);
+    setBulkMode(true);
+  };
+
+  const cancelBulkMode = () => {
+    setBulkMode(false);
+    setBulkUpdates({});
+  };
+
+  const saveBulkUpdates = async () => {
+    setSavingBulk(true);
+    const updates = Object.entries(bulkUpdates).filter(
+      ([id, val]) => {
+        const product = products.find(p => p.id === id);
+        return product && Number(val) !== product.quantity_available;
+      }
+    );
+    if (updates.length === 0) { toast.info('No changes to save'); setSavingBulk(false); return; }
+    let failed = 0;
+    for (const [id, val] of updates) {
+      const { error } = await supabase.from('products').update({ quantity_available: Number(val) }).eq('id', id);
+      if (error) failed++;
+    }
+    setSavingBulk(false);
+    setBulkMode(false);
+    setBulkUpdates({});
+    if (failed) toast.error(`${failed} update(s) failed`);
+    else toast.success(`${updates.length} product(s) updated`);
+    onRefresh();
+  };
 
   const updateThreshold = (val: number) => {
     setLowStockThreshold(val);
@@ -191,10 +228,23 @@ const SellerProducts = ({ products, userId, onRefresh }: Props) => {
           <h2 className="text-xl font-display font-bold text-foreground">Products</h2>
           <p className="text-sm text-muted-foreground">{products.length} listed</p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex gap-2 flex-wrap">
           <Button variant="outline" size="sm" onClick={() => setShowThresholdSetting(!showThresholdSetting)} className="gap-1.5">
             <Settings2 className="h-4 w-4" /> Stock Alert: {lowStockThreshold}
           </Button>
+          {products.length > 0 && !bulkMode && (
+            <Button variant="outline" size="sm" onClick={startBulkMode} className="gap-1.5">
+              <ListChecks className="h-4 w-4" /> Bulk Update Stock
+            </Button>
+          )}
+          {bulkMode && (
+            <>
+              <Button size="sm" onClick={saveBulkUpdates} disabled={savingBulk} className="gap-1.5">
+                <Save className="h-4 w-4" /> {savingBulk ? 'Saving...' : 'Save All'}
+              </Button>
+              <Button variant="outline" size="sm" onClick={cancelBulkMode}>Cancel</Button>
+            </>
+          )}
           <Button onClick={() => { resetForm(); setShowForm(!showForm); }} className="gap-2">
             <Plus className="h-4 w-4" /> Add Product
           </Button>
@@ -282,12 +332,26 @@ const SellerProducts = ({ products, userId, onRefresh }: Props) => {
                       {p.is_active ? 'Active' : 'Inactive'}
                     </Badge>
                   </div>
-                  <p className="text-sm text-muted-foreground">
+                   <p className="text-sm text-muted-foreground">
                     W: ₹{p.wholesale_price_min}–₹{p.wholesale_price_max}/{p.wholesale_unit} •
                     R: ₹{p.retail_price_min}–₹{p.retail_price_max}/{p.retail_unit} •
-                    Stock: <span className={p.is_active && p.quantity_available <= lowStockThreshold ? 'text-destructive font-semibold' : ''}>
-                      {p.quantity_available}{p.is_active && p.quantity_available <= lowStockThreshold ? ' ⚠' : ''}
-                    </span>
+                    {bulkMode ? (
+                      <span className="inline-flex items-center gap-1.5 ml-1">
+                        Stock: <Input
+                          type="number"
+                          min={0}
+                          value={bulkUpdates[p.id] ?? String(p.quantity_available)}
+                          onChange={e => setBulkUpdates(prev => ({ ...prev, [p.id]: e.target.value }))}
+                          className="w-20 h-7 text-xs inline-block"
+                        />
+                      </span>
+                    ) : (
+                      <>
+                        Stock: <span className={p.is_active && p.quantity_available <= lowStockThreshold ? 'text-destructive font-semibold' : ''}>
+                          {p.quantity_available}{p.is_active && p.quantity_available <= lowStockThreshold ? ' ⚠' : ''}
+                        </span>
+                      </>
+                    )}
                   </p>
                 </div>
               </div>
