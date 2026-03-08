@@ -5,7 +5,7 @@ import type { User, Session } from '@supabase/supabase-js';
 interface AuthContextType {
   user: User | null;
   session: Session | null;
-  profile: { full_name: string; role: string; farm_name?: string; village?: string } | null;
+  profile: { full_name: string; role: string; farm_name?: string; village?: string; phone?: string; primary_product?: string; avatar_url?: string } | null;
   loading: boolean;
   signOut: () => Promise<void>;
 }
