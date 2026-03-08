@@ -373,7 +373,7 @@ const ProductDetailPage = () => {
                       {new Date(review.created_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
                     </span>
                   </div>
-                  <StarRating rating={review.rating} />
+                  <StarRating value={review.rating} readonly size="sm" />
                   {review.comment && (
                     <p className="text-sm text-muted-foreground mt-2">{review.comment}</p>
                   )}
