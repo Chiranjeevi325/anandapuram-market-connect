@@ -31,6 +31,13 @@ export function useWishlist() {
       toast.error('Sign in to save favorites');
       return;
     }
+    // Check if it's a valid UUID (database product) or static product
+    const isValidUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(productId);
+    if (!isValidUUID) {
+      toast.error('Cannot save this product to wishlist');
+      return;
+    }
+
     setLoading(true);
     const isWished = wishlistIds.has(productId);
 
