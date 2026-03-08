@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
-import { Search, SlidersHorizontal, Star, ShoppingCart, Check, Heart } from 'lucide-react';
+import { SlidersHorizontal, Star, ShoppingCart, Check, Heart } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import PriceTicker from '@/components/PriceTicker';
 import Footer from '@/components/Footer';
@@ -9,6 +9,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useCart } from '@/contexts/CartContext';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
+import SearchSuggestions from '@/components/SearchSuggestions';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import { useWishlist } from '@/hooks/useWishlist';
@@ -143,10 +144,12 @@ const Products = () => {
         <p className="text-muted-foreground mb-8">Fresh flowers and produce from Anandapuram vendors</p>
 
         <div className="flex flex-col sm:flex-row gap-4 mb-8">
-          <div className="relative flex-1 max-w-md">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input placeholder="Search flowers, vegetables..." value={search} onChange={(e) => setSearch(e.target.value)} className="pl-10" />
-          </div>
+          <SearchSuggestions
+            value={search}
+            onChange={setSearch}
+            extraProducts={dbProducts}
+            className="flex-1 max-w-md"
+          />
           <div className="flex gap-2 flex-wrap">
             {['all', 'flowers', 'vegetables'].map(cat => (
               <Button key={cat} variant={category === cat ? 'default' : 'outline'} size="sm" onClick={() => setCategory(cat)} className="capitalize">
