@@ -7,8 +7,10 @@ import PriceTicker from '@/components/PriceTicker';
 import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Package, Clock, ArrowRight, Truck, MapPin, ShoppingBag } from 'lucide-react';
+import { Package, Clock, ArrowRight, Truck, MapPin, ShoppingBag, Star } from 'lucide-react';
 import { toast } from 'sonner';
+import StarRating from '@/components/StarRating';
+import ReviewForm from '@/components/ReviewForm';
 
 interface OrderItem {
   id: string;
