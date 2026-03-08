@@ -228,10 +228,23 @@ const SellerProducts = ({ products, userId, onRefresh }: Props) => {
           <h2 className="text-xl font-display font-bold text-foreground">Products</h2>
           <p className="text-sm text-muted-foreground">{products.length} listed</p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex gap-2 flex-wrap">
           <Button variant="outline" size="sm" onClick={() => setShowThresholdSetting(!showThresholdSetting)} className="gap-1.5">
             <Settings2 className="h-4 w-4" /> Stock Alert: {lowStockThreshold}
           </Button>
+          {products.length > 0 && !bulkMode && (
+            <Button variant="outline" size="sm" onClick={startBulkMode} className="gap-1.5">
+              <ListChecks className="h-4 w-4" /> Bulk Update Stock
+            </Button>
+          )}
+          {bulkMode && (
+            <>
+              <Button size="sm" onClick={saveBulkUpdates} disabled={savingBulk} className="gap-1.5">
+                <Save className="h-4 w-4" /> {savingBulk ? 'Saving...' : 'Save All'}
+              </Button>
+              <Button variant="outline" size="sm" onClick={cancelBulkMode}>Cancel</Button>
+            </>
+          )}
           <Button onClick={() => { resetForm(); setShowForm(!showForm); }} className="gap-2">
             <Plus className="h-4 w-4" /> Add Product
           </Button>
