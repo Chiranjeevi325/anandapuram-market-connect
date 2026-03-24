@@ -70,6 +70,9 @@ const Navbar = () => {
                 {profile?.role === 'seller' && (
                   <Link to="/seller"><Button variant="outline" size="sm">Dashboard</Button></Link>
                 )}
+                {profile?.role === 'admin' && (
+                  <Link to="/admin"><Button variant="outline" size="sm" className="gap-1.5 border-destructive/30 text-destructive hover:bg-destructive/10">🛡️ Admin</Button></Link>
+                )}
                 <span className="text-sm text-muted-foreground">{profile?.full_name || user.email}</span>
                 <Button variant="ghost" size="icon" onClick={signOut}><LogOut className="h-5 w-5" /></Button>
               </>
@@ -126,6 +129,11 @@ const Navbar = () => {
                   {profile?.role === 'seller' && (
                     <Link to="/seller" onClick={() => setIsOpen(false)}>
                       <Button variant="outline" size="sm" className="w-full">Seller Dashboard</Button>
+                    </Link>
+                  )}
+                  {profile?.role === 'admin' && (
+                    <Link to="/admin" onClick={() => setIsOpen(false)}>
+                      <Button variant="outline" size="sm" className="w-full gap-1.5 border-destructive/30 text-destructive">🛡️ Admin Panel</Button>
                     </Link>
                   )}
                   <Button variant="ghost" size="sm" className="w-full" onClick={() => { signOut(); setIsOpen(false); }}>Sign Out</Button>

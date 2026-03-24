@@ -48,13 +48,22 @@ const Products = () => {
     const load = async () => {
       const { data: productsData } = await supabase
         .from('products')
-        .select('*, profiles!products_seller_id_fkey(full_name, village)')
+        .select('*')
         .eq('is_active', true);
 
       if (!productsData) return;
 
-      // Fetch all reviews to compute avg ratings per seller
+      // Fetch seller profiles
       const sellerIds = [...new Set(productsData.map((p: any) => p.seller_id))];
+      const { data: profilesData } = await supabase
+        .from('profiles')
+        .select('user_id, full_name, village')
+        .in('user_id', sellerIds);
+
+      const profileMap = new Map<string, { full_name: string; village: string | null }>();
+      profilesData?.forEach((pr: any) => profileMap.set(pr.user_id, pr));
+
+      // Fetch all reviews to compute avg ratings per seller
       const { data: reviewsData } = await supabase
         .from('reviews')
         .select('seller_id, rating')
@@ -71,6 +80,7 @@ const Products = () => {
       setDbProducts(productsData.map((p: any) => {
         const entry = ratingMap.get(p.seller_id);
         const avg = entry ? entry.sum / entry.count : 0;
+        const sellerProfile = profileMap.get(p.seller_id);
         return {
           id: p.id,
           name: p.name,
@@ -79,8 +89,8 @@ const Products = () => {
           image: p.image_url || 'https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?w=400&h=400&fit=crop',
           wholesalePrice: { min: p.wholesale_price_min, max: p.wholesale_price_max, unit: p.wholesale_unit },
           retailPrice: { min: p.retail_price_min, max: p.retail_price_max, unit: p.retail_unit },
-          vendor: p.profiles?.full_name || 'Local Vendor',
-          vendorLocation: p.profiles?.village || 'Anandapuram',
+          vendor: sellerProfile?.full_name || 'Local Vendor',
+          vendorLocation: sellerProfile?.village || 'Anandapuram',
           rating: Math.round(avg * 10) / 10,
           tags: p.tags || [],
           inStock: true,
