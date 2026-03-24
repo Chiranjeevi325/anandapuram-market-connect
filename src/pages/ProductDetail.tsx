@@ -206,6 +206,7 @@ const ProductDetailPage = () => {
                 src={allImages[selectedImage]}
                 alt={product.name}
                 className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                onError={(e) => { (e.target as HTMLImageElement).src = '/placeholder.svg'; }}
               />
               {allImages.length > 1 && (
                 <>
