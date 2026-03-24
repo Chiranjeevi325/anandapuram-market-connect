@@ -131,6 +131,11 @@ const Navbar = () => {
                       <Button variant="outline" size="sm" className="w-full">Seller Dashboard</Button>
                     </Link>
                   )}
+                  {profile?.role === 'admin' && (
+                    <Link to="/admin" onClick={() => setIsOpen(false)}>
+                      <Button variant="outline" size="sm" className="w-full gap-1.5 border-destructive/30 text-destructive">🛡️ Admin Panel</Button>
+                    </Link>
+                  )}
                   <Button variant="ghost" size="sm" className="w-full" onClick={() => { signOut(); setIsOpen(false); }}>Sign Out</Button>
                 </div>
               ) : (
