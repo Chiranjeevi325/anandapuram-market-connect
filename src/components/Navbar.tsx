@@ -3,8 +3,8 @@ import { Link } from 'react-router-dom';
 import { Menu, X, ShoppingCart, User, Flower2, LogOut, Heart } from 'lucide-react';
 import NotificationBell from '@/components/NotificationBell';
 import { Button } from '@/components/ui/button';
-import { useAuth } from '@/contexts/AuthContext';
-import { useCart } from '@/contexts/CartContext';
+import { useAuth } from '@/hooks/useAuth';
+import { useCart } from '@/hooks/useCart';
 import { useWishlist } from '@/hooks/useWishlist';
 
 const Navbar = () => {
@@ -14,14 +14,16 @@ const Navbar = () => {
   const { totalWishlist } = useWishlist();
 
   return (
-    <nav className="sticky top-0 z-50 bg-card/95 backdrop-blur-md border-b">
+    <nav className="sticky top-0 z-50 glass shadow-ambient">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
-          <Link to="/" className="flex items-center gap-2 group">
-            <Flower2 className="h-7 w-7 text-primary group-hover:rotate-12 transition-transform duration-300" />
+          <Link to="/" className="flex items-center gap-2.5 group">
+            <div className="h-9 w-9 rounded-xl bg-primary flex items-center justify-center group-hover:scale-105 transition-transform duration-300">
+              <Flower2 className="h-5 w-5 text-primary-foreground" />
+            </div>
             <div>
               <span className="font-display text-lg font-bold text-foreground leading-none block">Anandapuram</span>
-              <span className="text-[10px] font-body text-muted-foreground uppercase tracking-widest">Market</span>
+              <span className="text-[10px] font-body text-muted-foreground uppercase tracking-[0.2em]">Market</span>
             </div>
           </Link>
 
@@ -35,29 +37,29 @@ const Navbar = () => {
               <Link
                 key={link.label}
                 to={link.to}
-                className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors duration-200 relative after:absolute after:bottom-0 after:left-0 after:w-full after:h-0.5 after:bg-primary after:scale-x-0 hover:after:scale-x-100 after:transition-transform after:duration-300 after:origin-left"
+                className="text-sm font-semibold text-muted-foreground hover:text-primary transition-colors duration-200 relative after:absolute after:bottom-[-2px] after:left-0 after:w-full after:h-0.5 after:bg-primary after:scale-x-0 hover:after:scale-x-100 after:transition-transform after:duration-300 after:origin-left"
               >
                 {link.label}
               </Link>
             ))}
           </div>
 
-          <div className="hidden md:flex items-center gap-3">
+          <div className="hidden md:flex items-center gap-2">
             <Link to="/wishlist">
-              <Button variant="ghost" size="icon" className="relative hover:scale-105 transition-transform duration-200">
+              <Button variant="ghost" size="icon" className="relative hover:bg-surface-container-high hover:scale-105 transition-all duration-200 rounded-xl">
                 <Heart className="h-5 w-5" />
                 {totalWishlist > 0 && (
-                  <span className="absolute -top-1 -right-1 bg-destructive text-destructive-foreground text-[10px] font-bold h-5 w-5 rounded-full flex items-center justify-center animate-[scale-in_0.3s_ease-out]">
+                  <span className="absolute -top-1 -right-1 bg-destructive text-destructive-foreground text-[10px] font-bold h-5 w-5 rounded-full flex items-center justify-center animate-scale-in">
                     {totalWishlist}
                   </span>
                 )}
               </Button>
             </Link>
             <Link to="/cart">
-              <Button variant="ghost" size="icon" className="relative hover:scale-105 transition-transform duration-200">
+              <Button variant="ghost" size="icon" className="relative hover:bg-surface-container-high hover:scale-105 transition-all duration-200 rounded-xl">
                 <ShoppingCart className="h-5 w-5" />
                 {totalItems > 0 && (
-                  <span className="absolute -top-1 -right-1 bg-accent text-accent-foreground text-[10px] font-bold h-5 w-5 rounded-full flex items-center justify-center animate-[scale-in_0.3s_ease-out]">
+                  <span className="absolute -top-1 -right-1 bg-secondary-container text-secondary-container-fg text-[10px] font-bold h-5 w-5 rounded-full flex items-center justify-center animate-scale-in">
                     {totalItems}
                   </span>
                 )}
@@ -66,16 +68,16 @@ const Navbar = () => {
             {user ? (
               <>
                 <NotificationBell />
-                <Link to="/orders"><Button variant="ghost" size="sm">Orders</Button></Link>
+                <Link to="/orders"><Button variant="ghost" size="sm" className="hover:bg-surface-container-high rounded-xl">Orders</Button></Link>
                 {profile?.role === 'seller' && (
-                  <Link to="/seller"><Button variant="outline" size="sm">Dashboard</Button></Link>
+                  <Link to="/seller"><Button variant="ghost" size="sm" className="bg-surface-container-low hover:bg-surface-container-high rounded-xl font-semibold">Dashboard</Button></Link>
                 )}
-                <span className="text-sm text-muted-foreground">{profile?.full_name || user.email}</span>
-                <Button variant="ghost" size="icon" onClick={signOut}><LogOut className="h-5 w-5" /></Button>
+                <span className="text-sm text-muted-foreground font-medium">{profile?.full_name || user.email}</span>
+                <Button variant="ghost" size="icon" onClick={signOut} className="hover:bg-surface-container-high rounded-xl"><LogOut className="h-5 w-5" /></Button>
               </>
             ) : (
               <Link to="/auth">
-                <Button variant="default" size="sm" className="gap-2"><User className="h-4 w-4" /> Sign In</Button>
+                <Button size="sm" className="gap-2 btn-gradient rounded-full px-5 font-semibold"><User className="h-4 w-4" /> Sign In</Button>
               </Link>
             )}
           </div>
@@ -83,7 +85,7 @@ const Navbar = () => {
           <div className="flex md:hidden items-center gap-1">
             {user && <NotificationBell />}
             <Link to="/wishlist">
-              <Button variant="ghost" size="icon" className="relative">
+              <Button variant="ghost" size="icon" className="relative rounded-xl">
                 <Heart className="h-5 w-5" />
                 {totalWishlist > 0 && (
                   <span className="absolute -top-1 -right-1 bg-destructive text-destructive-foreground text-[10px] font-bold h-5 w-5 rounded-full flex items-center justify-center">
@@ -93,16 +95,16 @@ const Navbar = () => {
               </Button>
             </Link>
             <Link to="/cart">
-              <Button variant="ghost" size="icon" className="relative">
+              <Button variant="ghost" size="icon" className="relative rounded-xl">
                 <ShoppingCart className="h-5 w-5" />
                 {totalItems > 0 && (
-                  <span className="absolute -top-1 -right-1 bg-accent text-accent-foreground text-[10px] font-bold h-5 w-5 rounded-full flex items-center justify-center">
+                  <span className="absolute -top-1 -right-1 bg-secondary-container text-secondary-container-fg text-[10px] font-bold h-5 w-5 rounded-full flex items-center justify-center">
                     {totalItems}
                   </span>
                 )}
               </Button>
             </Link>
-            <button onClick={() => setIsOpen(!isOpen)} className="p-1">
+            <button onClick={() => setIsOpen(!isOpen)} className="p-1.5 rounded-xl hover:bg-surface-container-high transition-colors">
               <div className={`transition-transform duration-300 ${isOpen ? 'rotate-90' : ''}`}>
                 {isOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
               </div>
@@ -111,28 +113,28 @@ const Navbar = () => {
         </div>
 
         <div className={`md:hidden overflow-hidden transition-all duration-300 ease-in-out ${isOpen ? 'max-h-96 opacity-100 pb-4' : 'max-h-0 opacity-0'}`}>
-          <div className="space-y-2">
-            <Link to="/" className="block py-2 text-sm font-medium hover:text-primary transition-colors" onClick={() => setIsOpen(false)}>Home</Link>
-            <Link to="/products" className="block py-2 text-sm text-muted-foreground hover:text-primary transition-colors" onClick={() => setIsOpen(false)}>Browse All</Link>
-            <Link to="/products?cat=flowers" className="block py-2 text-sm text-muted-foreground hover:text-primary transition-colors" onClick={() => setIsOpen(false)}>Flowers</Link>
-            <Link to="/products?cat=vegetables" className="block py-2 text-sm text-muted-foreground hover:text-primary transition-colors" onClick={() => setIsOpen(false)}>Vegetables</Link>
-            <div className="pt-2">
+          <div className="space-y-1 bg-surface-container-low rounded-2xl p-3">
+            <Link to="/" className="block py-2.5 px-3 text-sm font-semibold hover:bg-surface-container-high rounded-xl transition-colors" onClick={() => setIsOpen(false)}>Home</Link>
+            <Link to="/products" className="block py-2.5 px-3 text-sm text-muted-foreground hover:bg-surface-container-high rounded-xl transition-colors" onClick={() => setIsOpen(false)}>Browse All</Link>
+            <Link to="/products?cat=flowers" className="block py-2.5 px-3 text-sm text-muted-foreground hover:bg-surface-container-high rounded-xl transition-colors" onClick={() => setIsOpen(false)}>Flowers</Link>
+            <Link to="/products?cat=vegetables" className="block py-2.5 px-3 text-sm text-muted-foreground hover:bg-surface-container-high rounded-xl transition-colors" onClick={() => setIsOpen(false)}>Vegetables</Link>
+            <div className="pt-2 border-t border-outline-variant/15 mt-2">
               {user ? (
-                <div className="space-y-2">
+                <div className="space-y-1">
                   <Link to="/orders" onClick={() => setIsOpen(false)}>
-                    <Button variant="ghost" size="sm" className="w-full justify-start">My Orders</Button>
+                    <Button variant="ghost" size="sm" className="w-full justify-start rounded-xl">My Orders</Button>
                   </Link>
-                  <p className="text-sm text-muted-foreground">{profile?.full_name || user.email}</p>
+                  <p className="text-sm text-muted-foreground px-3">{profile?.full_name || user.email}</p>
                   {profile?.role === 'seller' && (
                     <Link to="/seller" onClick={() => setIsOpen(false)}>
-                      <Button variant="outline" size="sm" className="w-full">Seller Dashboard</Button>
+                      <Button variant="ghost" size="sm" className="w-full bg-surface-container-high rounded-xl">Seller Dashboard</Button>
                     </Link>
                   )}
-                  <Button variant="ghost" size="sm" className="w-full" onClick={() => { signOut(); setIsOpen(false); }}>Sign Out</Button>
+                  <Button variant="ghost" size="sm" className="w-full rounded-xl" onClick={() => { signOut(); setIsOpen(false); }}>Sign Out</Button>
                 </div>
               ) : (
                 <Link to="/auth" onClick={() => setIsOpen(false)}>
-                  <Button variant="default" size="sm" className="gap-2 w-full"><User className="h-4 w-4" /> Sign In</Button>
+                  <Button size="sm" className="gap-2 w-full btn-gradient rounded-full font-semibold"><User className="h-4 w-4" /> Sign In</Button>
                 </Link>
               )}
             </div>

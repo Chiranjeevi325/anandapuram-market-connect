@@ -10,11 +10,9 @@ interface AuthContextType {
   signOut: () => Promise<void>;
 }
 
-const AuthContext = createContext<AuthContextType>({
-  user: null, session: null, profile: null, loading: true, signOut: async () => {},
+export const AuthContext = createContext<AuthContextType>({
+  user: null, session: null, profile: null, loading: true, signOut: async () => { },
 });
-
-export const useAuth = () => useContext(AuthContext);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);

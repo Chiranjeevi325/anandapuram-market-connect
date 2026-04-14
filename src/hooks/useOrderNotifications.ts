@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { useAuth } from '@/contexts/AuthContext';
+import { Tables } from '@/integrations/supabase/types';
+import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
 
 const statusLabels: Record<string, string> = {
@@ -28,8 +29,8 @@ export const useOrderNotifications = () => {
           table: 'orders',
         },
         (payload) => {
-          const newRow = payload.new as any;
-          const oldRow = payload.old as any;
+          const newRow = payload.new as Tables<'orders'>;
+          const oldRow = payload.old as Tables<'orders'>;
 
           // Only notify if status actually changed
           if (newRow.status === oldRow.status) return;

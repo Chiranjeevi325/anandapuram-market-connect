@@ -1,16 +1,13 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import Navbar from '@/components/Navbar';
 import PriceTicker from '@/components/PriceTicker';
 import Footer from '@/components/Footer';
 import StarRating from '@/components/StarRating';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
-import { Skeleton } from '@/components/ui/skeleton';
-import { MapPin, ShoppingCart, Check, Star, Package, MessageSquare } from 'lucide-react';
-import { useCart } from '@/contexts/CartContext';
+import { MapPin, ShoppingCart, Check, Star, Package, MessageSquare, User } from 'lucide-react';
+import { useCart } from '@/hooks/useCart';
 import { toast } from 'sonner';
 
 interface SellerData {
@@ -55,21 +52,16 @@ const SellerProfile = () => {
   const [loading, setLoading] = useState(true);
   const [addedIds, setAddedIds] = useState<Set<string>>(new Set());
 
-  useEffect(() => {
-    if (!sellerId) return;
-    Promise.all([fetchSeller(), fetchProducts(), fetchReviews()]).then(() => setLoading(false));
-  }, [sellerId]);
-
-  const fetchSeller = async () => {
+  const fetchSeller = useCallback(async () => {
     const { data } = await supabase
       .from('profiles')
       .select('full_name, farm_name, village, primary_product, avatar_url, user_id')
       .eq('user_id', sellerId!)
       .single();
     if (data) setSeller(data);
-  };
+  }, [sellerId]);
 
-  const fetchProducts = async () => {
+  const fetchProducts = useCallback(async () => {
     const { data } = await supabase
       .from('products')
       .select('id, name, name_local, category, image_url, wholesale_price_min, wholesale_price_max, wholesale_unit, retail_price_min, retail_price_max, retail_unit, tags, quantity_available')
@@ -77,9 +69,9 @@ const SellerProfile = () => {
       .eq('is_active', true)
       .order('created_at', { ascending: false });
     if (data) setProducts(data);
-  };
+  }, [sellerId]);
 
-  const fetchReviews = async () => {
+  const fetchReviews = useCallback(async () => {
     const { data } = await supabase
       .from('reviews')
       .select('id, rating, comment, created_at, buyer_id')
@@ -101,7 +93,12 @@ const SellerProfile = () => {
       created_at: r.created_at,
       buyer_name: nameMap.get(r.buyer_id) || 'Buyer',
     })));
-  };
+  }, [sellerId]);
+
+  useEffect(() => {
+    if (!sellerId) return;
+    Promise.all([fetchSeller(), fetchProducts(), fetchReviews()]).then(() => setLoading(false));
+  }, [sellerId, fetchSeller, fetchProducts, fetchReviews]);
 
   const avgRating = reviews.length > 0
     ? reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length
@@ -126,12 +123,12 @@ const SellerProfile = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-background">
+      <div className="min-h-screen bg-surface">
         <PriceTicker />
         <Navbar />
         <div className="container mx-auto px-4 py-10 space-y-6">
-          <Skeleton className="h-32 w-full rounded-xl" />
-          <Skeleton className="h-64 w-full rounded-xl" />
+          <div className="h-32 w-full rounded-2xl bg-surface-container-low animate-shimmer" />
+          <div className="h-64 w-full rounded-2xl bg-surface-container-low animate-shimmer" />
         </div>
       </div>
     );
@@ -139,12 +136,12 @@ const SellerProfile = () => {
 
   if (!seller) {
     return (
-      <div className="min-h-screen bg-background">
+      <div className="min-h-screen bg-surface">
         <PriceTicker />
         <Navbar />
         <div className="container mx-auto px-4 py-20 text-center">
-          <p className="text-muted-foreground text-lg">Seller not found.</p>
-          <Link to="/products"><Button variant="outline" className="mt-4">Browse Products</Button></Link>
+          <p className="text-muted-foreground text-lg font-body">Seller not found.</p>
+          <Link to="/products"><Button className="mt-4 btn-gradient rounded-full px-8 font-semibold">Browse Products</Button></Link>
         </div>
         <Footer />
       </div>
@@ -152,55 +149,60 @@ const SellerProfile = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-surface">
       <PriceTicker />
       <Navbar />
 
       <div className="container mx-auto px-4 py-10">
         {/* Seller header */}
-        <Card className="mb-8">
-          <CardContent className="p-6 sm:p-8 flex flex-col sm:flex-row items-start gap-6">
-            <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0 text-primary font-display text-2xl font-bold">
-              {seller.full_name.charAt(0).toUpperCase()}
+        <div className="tonal-card p-6 sm:p-8 mb-8">
+          <div className="flex flex-col sm:flex-row items-start gap-6">
+            <div className="w-20 h-20 rounded-2xl bg-surface-container-low flex items-center justify-center flex-shrink-0 text-primary font-display text-2xl font-bold">
+              {seller.avatar_url ? (
+                <img src={seller.avatar_url} alt={seller.full_name} className="w-full h-full rounded-2xl object-cover" />
+              ) : (
+                seller.full_name.charAt(0).toUpperCase()
+              )}
             </div>
             <div className="flex-1">
               <h1 className="text-2xl sm:text-3xl font-display font-bold text-foreground">
                 {seller.farm_name || seller.full_name}
               </h1>
               {seller.farm_name && (
-                <p className="text-muted-foreground text-sm">{seller.full_name}</p>
+                <p className="text-muted-foreground text-sm font-body">{seller.full_name}</p>
               )}
               <div className="flex flex-wrap items-center gap-4 mt-3 text-sm text-muted-foreground">
                 {seller.village && (
-                  <span className="flex items-center gap-1"><MapPin className="h-4 w-4" />{seller.village}</span>
+                  <span className="flex items-center gap-1 font-body"><MapPin className="h-4 w-4" />{seller.village}</span>
                 )}
                 {seller.primary_product && (
-                  <Badge variant="secondary">{seller.primary_product}</Badge>
+                  <span className="freshness-badge">{seller.primary_product}</span>
                 )}
               </div>
               <div className="flex items-center gap-3 mt-4">
                 <StarRating value={Math.round(avgRating)} readonly size="md" />
                 <span className="text-sm font-medium text-foreground">{avgRating.toFixed(1)}</span>
-                <span className="text-sm text-muted-foreground">({reviews.length} review{reviews.length !== 1 ? 's' : ''})</span>
+                <span className="text-sm text-muted-foreground font-body">({reviews.length} review{reviews.length !== 1 ? 's' : ''})</span>
               </div>
             </div>
-            <div className="flex flex-col items-end gap-1 text-sm text-muted-foreground">
+            <div className="flex flex-col items-end gap-1 text-sm text-muted-foreground font-body">
               <span className="flex items-center gap-1"><Package className="h-4 w-4" />{products.length} product{products.length !== 1 ? 's' : ''}</span>
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
 
         {/* Products */}
+        <p className="text-sm font-semibold text-secondary uppercase tracking-wider mb-2">Catalog</p>
         <h2 className="text-xl font-display font-bold text-foreground mb-4">Products</h2>
         {products.length === 0 ? (
-          <p className="text-muted-foreground mb-8">No products listed yet.</p>
+          <p className="text-muted-foreground mb-8 font-body">No products listed yet.</p>
         ) : (
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-10">
             {products.map(p => {
               const justAdded = addedIds.has(p.id);
               return (
-                <div key={p.id} className="bg-card rounded-xl overflow-hidden shadow-[var(--shadow-card)] hover:shadow-[var(--shadow-elevated)] transition-all duration-300 group">
-                  <div className="relative aspect-square overflow-hidden">
+                <div key={p.id} className="tonal-card overflow-hidden group">
+                  <Link to={`/product/${p.id}`} className="relative aspect-[4/5] overflow-hidden block">
                     <img
                       src={p.image_url || 'https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?w=400&h=400&fit=crop'}
                       alt={p.name}
@@ -210,28 +212,27 @@ const SellerProfile = () => {
                     {p.tags && p.tags.length > 0 && (
                       <div className="absolute top-3 left-3 flex gap-1.5">
                         {p.tags.map(tag => (
-                          <Badge key={tag} className="bg-secondary text-secondary-foreground text-[10px] font-semibold">{tag}</Badge>
+                          <span key={tag} className="freshness-badge text-[10px]">{tag}</span>
                         ))}
                       </div>
                     )}
-                  </div>
-                  <div className="p-4">
+                  </Link>
+                  <div className="p-5">
                     <h3 className="font-display font-bold text-foreground mb-1">{p.name}</h3>
-                    {p.name_local && <p className="text-xs text-muted-foreground mb-2">{p.name_local}</p>}
-                    <div className="space-y-1 mb-4 text-sm">
+                    {p.name_local && <p className="text-xs text-muted-foreground mb-2 font-body">{p.name_local}</p>}
+                    <div className="space-y-1.5 mb-4 text-sm">
                       <div className="flex justify-between">
-                        <span className="text-muted-foreground">Wholesale</span>
-                        <span className="font-semibold text-primary">₹{p.wholesale_price_min}–₹{p.wholesale_price_max}</span>
+                        <span className="text-muted-foreground font-body">Wholesale</span>
+                        <span className="font-semibold text-secondary">₹{p.wholesale_price_min}–₹{p.wholesale_price_max}</span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-muted-foreground">Retail</span>
+                        <span className="text-muted-foreground font-body">Retail</span>
                         <span className="font-semibold text-foreground">₹{p.retail_price_min}–₹{p.retail_price_max}</span>
                       </div>
                     </div>
                     <Button
                       size="sm"
-                      className="w-full gap-2"
-                      variant={justAdded ? 'secondary' : 'default'}
+                      className={`w-full gap-2 rounded-full font-semibold transition-all duration-300 ${justAdded ? 'bg-tertiary-fixed text-tertiary-fixed-fg' : 'btn-gradient'}`}
                       onClick={() => handleAddToCart(p)}
                     >
                       {justAdded ? <><Check className="h-4 w-4" /> Added</> : <><ShoppingCart className="h-4 w-4" /> Add to Cart</>}
@@ -244,28 +245,30 @@ const SellerProfile = () => {
         )}
 
         {/* Reviews */}
+        <p className="text-sm font-semibold text-secondary uppercase tracking-wider mb-2">Feedback</p>
         <h2 className="text-xl font-display font-bold text-foreground mb-4 flex items-center gap-2">
           <MessageSquare className="h-5 w-5" /> Reviews
         </h2>
         {reviews.length === 0 ? (
-          <Card><CardContent className="p-6 text-center text-muted-foreground">No reviews yet.</CardContent></Card>
+          <div className="tonal-card p-6 text-center text-muted-foreground font-body">No reviews yet.</div>
         ) : (
           <div className="space-y-4">
             {reviews.map(r => (
-              <Card key={r.id}>
-                <CardContent className="p-5">
-                  <div className="flex items-center justify-between mb-2">
-                    <div className="flex items-center gap-3">
-                      <span className="font-medium text-foreground text-sm">{r.buyer_name}</span>
-                      <StarRating value={r.rating} readonly size="sm" />
+              <div key={r.id} className="tonal-card p-5">
+                <div className="flex items-center justify-between mb-2">
+                  <div className="flex items-center gap-3">
+                    <div className="h-8 w-8 rounded-full bg-surface-container-high flex items-center justify-center">
+                      <User className="h-4 w-4 text-muted-foreground" />
                     </div>
-                    <span className="text-xs text-muted-foreground">
-                      {new Date(r.created_at).toLocaleDateString()}
-                    </span>
+                    <span className="font-medium text-foreground text-sm">{r.buyer_name}</span>
+                    <StarRating value={r.rating} readonly size="sm" />
                   </div>
-                  {r.comment && <p className="text-sm text-muted-foreground">{r.comment}</p>}
-                </CardContent>
-              </Card>
+                  <span className="text-xs text-muted-foreground font-body">
+                    {new Date(r.created_at).toLocaleDateString()}
+                  </span>
+                </div>
+                {r.comment && <p className="text-sm text-muted-foreground font-body">{r.comment}</p>}
+              </div>
             ))}
           </div>
         )}

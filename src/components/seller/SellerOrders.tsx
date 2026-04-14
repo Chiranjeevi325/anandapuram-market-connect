@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -45,9 +45,7 @@ const SellerOrders = ({ userId }: Props) => {
   const [loading, setLoading] = useState(true);
   const [tab, setTab] = useState<'all' | 'pending' | 'active' | 'completed'>('all');
 
-  useEffect(() => { fetchOrders(); }, [userId]);
-
-  const fetchOrders = async () => {
+  const fetchOrders = useCallback(async () => {
     const { data: ordersData } = await supabase
       .from('orders')
       .select('*, order_items(*, products(name, name_local, image_url))')
@@ -56,13 +54,18 @@ const SellerOrders = ({ userId }: Props) => {
 
     if (!ordersData) { setOrders([]); setLoading(false); return; }
 
-    const buyerIds = [...new Set(ordersData.map((o: any) => o.buyer_id))];
+    const buyerIds = [...new Set(ordersData.map(o => o.buyer_id))];
     const { data: profiles } = await supabase.from('profiles').select('user_id, full_name, phone').in('user_id', buyerIds);
     const profileMap = new Map(profiles?.map(p => [p.user_id, p]) || []);
 
-    setOrders(ordersData.map((o: any) => ({ ...o, buyer_profile: profileMap.get(o.buyer_id) || null })));
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    setOrders((ordersData as any[]).map(o => ({ ...o, buyer_profile: profileMap.get(o.buyer_id) || null })));
     setLoading(false);
-  };
+  }, [userId]);
+
+  useEffect(() => {
+    fetchOrders();
+  }, [fetchOrders]);
 
   const updateStatus = async (orderId: string, newStatus: string) => {
     const { error } = await supabase.from('orders').update({ status: newStatus }).eq('id', orderId);

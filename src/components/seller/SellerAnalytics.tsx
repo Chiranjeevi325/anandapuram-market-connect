@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { Tables } from '@/integrations/supabase/types';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import { IndianRupee, ShoppingCart, Package, Star, TrendingUp, Users } from 'lucide-react';
@@ -32,7 +33,7 @@ const SellerAnalytics = ({ userId, productCount }: Props) => {
         supabase.from('reviews').select('rating').eq('seller_id', userId),
       ]);
       setOrders(ordersData || []);
-      const ratings = (reviewsData || []).map((r: any) => r.rating);
+      const ratings = (reviewsData || []).map((r: { rating: number }) => r.rating);
       setReviewCount(ratings.length);
       setAvgRating(ratings.length ? ratings.reduce((a: number, b: number) => a + b, 0) / ratings.length : 0);
       setLoading(false);

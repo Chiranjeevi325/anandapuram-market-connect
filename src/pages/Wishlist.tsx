@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Heart, ShoppingCart, Check, Star, ArrowRight } from 'lucide-react';
 import Navbar from '@/components/Navbar';
@@ -6,10 +6,9 @@ import PriceTicker from '@/components/PriceTicker';
 import Footer from '@/components/Footer';
 import { products as staticProducts } from '@/data/products';
 import { supabase } from '@/integrations/supabase/client';
-import { useCart } from '@/contexts/CartContext';
+import { useCart } from '@/hooks/useCart';
 import { useWishlist } from '@/hooks/useWishlist';
-import { useAuth } from '@/contexts/AuthContext';
-import { Badge } from '@/components/ui/badge';
+import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 
@@ -43,13 +42,13 @@ const Wishlist = () => {
 
       const ids = Array.from(wishlistIds);
 
-      // Load DB products
       const { data: dbData } = await supabase
         .from('products')
         .select('*, profiles!products_seller_id_fkey(full_name)')
         .in('id', ids);
 
-      const dbProducts: WishlistProduct[] = (dbData || []).map((p: any) => ({
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const dbProducts: WishlistProduct[] = (dbData as any[] || []).map(p => ({
         id: p.id,
         name: p.name,
         nameLocal: p.name_local || '',
@@ -63,7 +62,6 @@ const Wishlist = () => {
         sellerId: p.seller_id,
       }));
 
-      // Also check static products
       const dbIdSet = new Set(dbProducts.map(p => p.id));
       const staticMatches: WishlistProduct[] = staticProducts
         .filter(p => ids.includes(p.id) && !dbIdSet.has(p.id))
@@ -109,15 +107,15 @@ const Wishlist = () => {
 
   if (!user) {
     return (
-      <div className="min-h-screen bg-background">
+      <div className="min-h-screen bg-surface">
         <PriceTicker />
         <Navbar />
         <div className="container mx-auto px-4 py-20 text-center">
-          <Heart className="h-16 w-16 text-muted-foreground/30 mx-auto mb-4" />
+          <Heart className="h-16 w-16 text-muted-foreground/20 mx-auto mb-4" />
           <h1 className="text-3xl font-display font-bold text-foreground mb-3">Your Wishlist</h1>
-          <p className="text-muted-foreground mb-6">Sign in to save your favorite products</p>
+          <p className="text-muted-foreground mb-6 font-body">Sign in to save your favorite products</p>
           <Link to="/auth">
-            <Button className="gap-2">Sign In <ArrowRight className="h-4 w-4" /></Button>
+            <Button className="gap-2 btn-gradient rounded-full px-8 font-semibold">Sign In <ArrowRight className="h-4 w-4" /></Button>
           </Link>
         </div>
         <Footer />
@@ -126,19 +124,20 @@ const Wishlist = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-surface">
       <PriceTicker />
       <Navbar />
       <div className="container mx-auto px-4 py-10">
+        <p className="text-sm font-semibold text-secondary uppercase tracking-wider mb-1">Saved Items</p>
         <h1 className="text-3xl sm:text-4xl font-display font-bold text-foreground mb-2">Your Wishlist</h1>
-        <p className="text-muted-foreground mb-8">{products.length} saved {products.length === 1 ? 'item' : 'items'}</p>
+        <p className="text-muted-foreground mb-8 font-body">{products.length} saved {products.length === 1 ? 'item' : 'items'}</p>
 
         {products.length === 0 ? (
           <div className="text-center py-20">
-            <Heart className="h-16 w-16 text-muted-foreground/30 mx-auto mb-4" />
-            <p className="text-muted-foreground text-lg mb-4">Your wishlist is empty</p>
+            <Heart className="h-16 w-16 text-muted-foreground/20 mx-auto mb-4" />
+            <p className="text-muted-foreground text-lg mb-4 font-body">Your wishlist is empty</p>
             <Link to="/products">
-              <Button variant="outline" className="gap-2">Browse Products <ArrowRight className="h-4 w-4" /></Button>
+              <Button className="gap-2 btn-gradient rounded-full px-8 font-semibold">Browse Products <ArrowRight className="h-4 w-4" /></Button>
             </Link>
           </div>
         ) : (
@@ -148,44 +147,43 @@ const Wishlist = () => {
               return (
                 <div
                   key={product.id}
-                  className="bg-card rounded-xl overflow-hidden shadow-[var(--shadow-card)] hover:shadow-[var(--shadow-elevated)] hover:-translate-y-1 transition-all duration-500 group animate-fade-in-up"
+                  className="tonal-card overflow-hidden group animate-fade-in-up"
                   style={{ animationDelay: `${Math.min(i, 7) * 60}ms`, animationFillMode: 'both' }}
                 >
-                  <div className="relative aspect-square overflow-hidden">
+                  <Link to={`/product/${product.id}`} className="relative aspect-[4/5] overflow-hidden block">
                     <img src={product.image} alt={product.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy" />
                     <div className="absolute top-3 left-3 flex gap-1.5">
                       {product.tags.map(tag => (
-                        <Badge key={tag} className="bg-secondary text-secondary-foreground text-[10px] font-semibold">{tag}</Badge>
+                        <span key={tag} className="freshness-badge text-[10px]">{tag}</span>
                       ))}
                     </div>
                     <button
-                      onClick={() => toggle(product.id)}
-                      className="absolute top-3 right-3 h-8 w-8 rounded-full bg-card/80 backdrop-blur-sm flex items-center justify-center hover:bg-card transition-all duration-200 hover:scale-110"
+                      onClick={(e) => { e.preventDefault(); e.stopPropagation(); toggle(product.id); }}
+                      className="absolute top-3 right-3 h-9 w-9 rounded-full glass-card flex items-center justify-center hover:scale-110 transition-all duration-200"
                     >
                       <Heart className={`h-4 w-4 transition-colors duration-200 ${isWishlisted(product.id) ? 'fill-destructive text-destructive' : 'text-muted-foreground'}`} />
                     </button>
-                  </div>
-                  <div className="p-4">
+                  </Link>
+                  <div className="p-5">
                     <div className="flex items-center justify-between mb-1">
                       <h3 className="font-display font-bold text-foreground">{product.name}</h3>
                       {product.rating > 0 && (
                         <div className="flex items-center gap-1">
-                          <Star className="h-3.5 w-3.5 fill-secondary text-secondary" />
-                          <span className="text-xs font-medium text-muted-foreground">{product.rating}</span>
+                          <Star className="h-3.5 w-3.5 fill-secondary-container text-secondary-container" />
+                          <span className="text-xs font-semibold text-muted-foreground">{product.rating}</span>
                         </div>
                       )}
                     </div>
-                    <p className="text-xs text-muted-foreground mb-3">{product.nameLocal} • {product.vendor}</p>
-                    <div className="flex items-baseline justify-between mb-3">
+                    <p className="text-xs text-muted-foreground mb-3 font-body">{product.nameLocal} • {product.vendor}</p>
+                    <div className="flex items-baseline justify-between mb-4">
                       <div>
-                        <span className="text-lg font-bold text-primary">₹{product.wholesalePrice.min}</span>
+                        <span className="text-lg font-bold text-secondary">₹{product.wholesalePrice.min}</span>
                         <span className="text-xs text-muted-foreground ml-1">– ₹{product.wholesalePrice.max} / {product.wholesalePrice.unit}</span>
                       </div>
                     </div>
                     <Button
                       size="sm"
-                      className="w-full gap-2"
-                      variant={justAdded ? 'secondary' : 'default'}
+                      className={`w-full gap-2 rounded-full font-semibold transition-all duration-300 ${justAdded ? 'bg-tertiary-fixed text-tertiary-fixed-fg' : 'btn-gradient'}`}
                       onClick={() => handleAddToCart(product)}
                     >
                       {justAdded ? <><Check className="h-4 w-4" /> Added</> : <><ShoppingCart className="h-4 w-4" /> Add to Cart</>}

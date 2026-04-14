@@ -1,7 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuth } from '@/hooks/useAuth';
 import Navbar from '@/components/Navbar';
 import PriceTicker from '@/components/PriceTicker';
 import Footer from '@/components/Footer';
@@ -37,6 +37,18 @@ const SellerDashboard = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
 
+  const fetchProducts = useCallback(async () => {
+    if (!user) return;
+    const { data } = await supabase
+      .from('products')
+      .select('*')
+      .eq('seller_id', user.id)
+      .order('created_at', { ascending: false });
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    setProducts((data as any) || []);
+    setLoading(false);
+  }, [user]);
+
   useEffect(() => {
     if (!authLoading && (!user || profile?.role !== 'seller')) {
       navigate('/auth');
@@ -44,40 +56,38 @@ const SellerDashboard = () => {
   }, [authLoading, user, profile, navigate]);
 
   useEffect(() => {
-    if (user) fetchProducts();
-  }, [user]);
-
-  const fetchProducts = async () => {
-    const { data } = await supabase
-      .from('products')
-      .select('*')
-      .eq('seller_id', user!.id)
-      .order('created_at', { ascending: false });
-    setProducts((data as any) || []);
-    setLoading(false);
-  };
+    if (user && profile?.role === 'seller') fetchProducts();
+  }, [user, profile, fetchProducts]);
 
   if (authLoading || loading) {
-    return <div className="min-h-screen flex items-center justify-center bg-background">Loading...</div>;
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-surface">
+        <div className="text-center">
+          <div className="h-8 w-8 rounded-full border-2 border-primary border-t-transparent animate-spin mx-auto mb-3" />
+          <p className="text-muted-foreground font-body">Loading dashboard...</p>
+        </div>
+      </div>
+    );
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-surface">
       <PriceTicker />
       <Navbar />
 
       <div className="container mx-auto px-4 py-10">
         <div className="mb-8">
-          <h1 className="text-3xl font-display font-bold text-foreground">Seller Dashboard</h1>
-          <p className="text-muted-foreground">{profile?.farm_name || 'My Shop'} • {profile?.village || ''}</p>
+          <p className="text-sm font-semibold text-secondary uppercase tracking-wider mb-2">Seller Portal</p>
+          <h1 className="text-3xl font-display font-bold text-foreground">Dashboard</h1>
+          <p className="text-muted-foreground font-body">{profile?.farm_name || 'My Shop'} • {profile?.village || ''}</p>
         </div>
 
         <Tabs defaultValue="products" className="space-y-6">
-          <TabsList className="bg-muted/50">
-            <TabsTrigger value="products" className="gap-2"><Package className="h-4 w-4" /> Products</TabsTrigger>
-            <TabsTrigger value="orders" className="gap-2"><ShoppingCart className="h-4 w-4" /> Orders</TabsTrigger>
-            <TabsTrigger value="analytics" className="gap-2"><BarChart3 className="h-4 w-4" /> Analytics</TabsTrigger>
-            <TabsTrigger value="profile" className="gap-2"><UserCog className="h-4 w-4" /> Profile</TabsTrigger>
+          <TabsList className="bg-surface-container-low rounded-2xl p-1.5">
+            <TabsTrigger value="products" className="gap-2 rounded-xl data-[state=active]:bg-secondary-container data-[state=active]:text-secondary-container-fg"><Package className="h-4 w-4" /> Products</TabsTrigger>
+            <TabsTrigger value="orders" className="gap-2 rounded-xl data-[state=active]:bg-secondary-container data-[state=active]:text-secondary-container-fg"><ShoppingCart className="h-4 w-4" /> Orders</TabsTrigger>
+            <TabsTrigger value="analytics" className="gap-2 rounded-xl data-[state=active]:bg-secondary-container data-[state=active]:text-secondary-container-fg"><BarChart3 className="h-4 w-4" /> Analytics</TabsTrigger>
+            <TabsTrigger value="profile" className="gap-2 rounded-xl data-[state=active]:bg-secondary-container data-[state=active]:text-secondary-container-fg"><UserCog className="h-4 w-4" /> Profile</TabsTrigger>
           </TabsList>
 
           <TabsContent value="products">
@@ -98,11 +108,11 @@ const SellerDashboard = () => {
                 userId={user!.id}
                 initialProfile={{
                   full_name: profile.full_name,
-                  phone: (profile as any).phone || null,
+                  phone: profile.phone || null,
                   farm_name: profile.farm_name || null,
                   village: profile.village || null,
-                  primary_product: (profile as any).primary_product || null,
-                  avatar_url: (profile as any).avatar_url || null,
+                  primary_product: profile.primary_product || null,
+                  avatar_url: profile.avatar_url || null,
                 }}
                 onUpdated={() => window.location.reload()}
               />

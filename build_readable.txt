@@ -1,0 +1,156 @@
+﻿
+> vite_react_shadcn_ts@0.0.0 build
+> vite build
+
+[36mvite v5.4.19 [32mbuilding for production...[36m[39m
+transforming...
+node.exe : 
+Browserslist: browsers 
+data (caniuse-lite) is 
+9 months old. Please 
+run:
+At line:1 char:1
++ & "C:\Program 
+Files\nodejs/node.exe" 
+"C:\Program 
+Files\nodejs/node_mo 
+...
++ ~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~
+~~
+    + CategoryInfo     
+         : NotSpecifi  
+  ed: (Browserslist:   
+  b...ld. Please ru    
+n::String) [], Rem    
+oteException
+    + FullyQualifiedEr 
+   rorId : NativeComm  
+  andError
+ 
+  npx update-browsersli
+st-db@latest
+  Why you should do it 
+regularly: https://gith
+ub.com/browserslist/upd
+ate-db#readme
+[32mΓ£ô[39m 2918 modules transformed.
+[31mx[39m Build 
+failed in 5.44s
+[31merror during 
+build:
+[31msrc/pages/SellerPr
+ofile.tsx (13:9): 
+"useCart" is not 
+exported by "src/contex
+ts/CartContext.tsx", 
+imported by "src/pages/
+SellerProfile.tsx".[31
+m
+file: [36mC:/Users/LEN
+OVO/Downloads/anandapur
+am-market-connect-main/
+anandapuram-market-conn
+ect/src/pages/SellerPro
+file.tsx:13:9[31m
+[33m
+11: import { Skeleton 
+} from '@/components/ui
+/skeleton';
+12: import { MapPin, 
+ShoppingCart, Check, 
+Star, Package, 
+MessageSquare } from 
+'lucide-react';
+13: import { useCart } 
+from '@/contexts/CartCo
+ntext';
+             ^
+14: import { toast } 
+from 'sonner';
+[31m
+    at getRollupError (
+file:///C:/Users/LENOVO
+/Downloads/anandapuram-
+market-connect-main/ana
+ndapuram-market-connect
+/node_modules/rollup/di
+st/es/shared/parseAst.j
+s:395:41)
+    at error (file:///C
+:/Users/LENOVO/Download
+s/anandapuram-market-co
+nnect-main/anandapuram-
+market-connect/node_mod
+ules/rollup/dist/es/sha
+red/parseAst.js:391:42)
+    at Module.error (fi
+le:///C:/Users/LENOVO/D
+ownloads/anandapuram-ma
+rket-connect-main/anand
+apuram-market-connect/n
+ode_modules/rollup/dist
+/es/shared/node-entry.j
+s:15535:16)
+    at 
+Module.traceVariable (f
+ile:///C:/Users/LENOVO/
+Downloads/anandapuram-m
+arket-connect-main/anan
+dapuram-market-connect/
+node_modules/rollup/dis
+t/es/shared/node-entry.
+js:15984:29)
+    at ModuleScope.find
+Variable (file:///C:/Us
+ers/LENOVO/Downloads/an
+andapuram-market-connec
+t-main/anandapuram-mark
+et-connect/node_modules
+/rollup/dist/es/shared/
+node-entry.js:13770:39)
+    at ReturnValueScope
+.findVariable (file:///
+C:/Users/LENOVO/Downloa
+ds/anandapuram-market-c
+onnect-main/anandapuram
+-market-connect/node_mo
+dules/rollup/dist/es/sh
+ared/node-entry.js:5252
+:38)
+    at FunctionBodyScop
+e.findVariable (file://
+/C:/Users/LENOVO/Downlo
+ads/anandapuram-market-
+connect-main/anandapura
+m-market-connect/node_m
+odules/rollup/dist/es/s
+hared/node-entry.js:525
+2:38)
+    at Identifier.bind 
+(file:///C:/Users/LENOV
+O/Downloads/anandapuram
+-market-connect-main/an
+andapuram-market-connec
+t/node_modules/rollup/d
+ist/es/shared/node-entr
+y.js:5035:40)
+    at 
+CallExpression.bind (fi
+le:///C:/Users/LENOVO/D
+ownloads/anandapuram-ma
+rket-connect-main/anand
+apuram-market-connect/n
+ode_modules/rollup/dist
+/es/shared/node-entry.j
+s:2855:23)
+    at 
+CallExpression.bind (fi
+le:///C:/Users/LENOVO/D
+ownloads/anandapuram-ma
+rket-connect-main/anand
+apuram-market-connect/n
+ode_modules/rollup/dist
+/es/shared/node-entry.j
+s:11235:15)[39m

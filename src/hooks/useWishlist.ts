@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
 
 export function useWishlist() {
@@ -18,7 +18,7 @@ export function useWishlist() {
       .select('product_id')
       .eq('user_id', user.id);
     if (data) {
-      setWishlistIds(new Set(data.map((w: any) => w.product_id)));
+      setWishlistIds(new Set(data.map(w => w.product_id)));
     }
   }, [user]);
 

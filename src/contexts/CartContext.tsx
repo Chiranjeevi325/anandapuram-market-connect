@@ -23,17 +23,15 @@ interface CartContextType {
   totalAmount: number;
 }
 
-const CartContext = createContext<CartContextType>({
+export const CartContext = createContext<CartContextType>({
   items: [],
-  addItem: () => {},
-  removeItem: () => {},
-  updateQuantity: () => {},
-  clearCart: () => {},
+  addItem: () => { },
+  removeItem: () => { },
+  updateQuantity: () => { },
+  clearCart: () => { },
   totalItems: 0,
   totalAmount: 0,
 });
-
-export const useCart = () => useContext(CartContext);
 
 const CART_KEY = 'anandapuram-cart';
 

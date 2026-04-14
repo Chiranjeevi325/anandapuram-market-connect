@@ -1,10 +1,10 @@
 import { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Flower2, ArrowLeft } from 'lucide-react';
+import { Flower2, ArrowLeft, Mail } from 'lucide-react';
 import { toast } from 'sonner';
 
 const ForgotPassword = () => {
@@ -27,25 +27,31 @@ const ForgotPassword = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
-      <div className="p-4">
-        <Link to="/auth" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground">
+    <div className="min-h-screen bg-surface flex flex-col">
+      <div className="p-4 lg:p-6">
+        <Link to="/auth" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground font-body">
           <ArrowLeft className="h-4 w-4" /> Back to sign in
         </Link>
       </div>
       <div className="flex-1 flex items-center justify-center px-4 pb-16">
         <div className="w-full max-w-md text-center">
-          <Flower2 className="h-10 w-10 text-primary mx-auto mb-3" />
+          <div className="h-14 w-14 rounded-2xl bg-primary flex items-center justify-center mx-auto mb-4">
+            <Flower2 className="h-7 w-7 text-primary-foreground" />
+          </div>
           <h1 className="text-2xl font-display font-bold mb-2">Reset Password</h1>
           {sent ? (
-            <p className="text-muted-foreground">Check your email for a password reset link.</p>
+            <div className="tonal-card p-8 mt-6">
+              <Mail className="h-12 w-12 text-primary mx-auto mb-4" />
+              <p className="text-foreground font-semibold mb-2">Check your email</p>
+              <p className="text-muted-foreground text-sm font-body">We've sent a password reset link to <strong>{email}</strong>. Click the link to reset your password.</p>
+            </div>
           ) : (
-            <form onSubmit={handleSubmit} className="space-y-4 text-left mt-6">
+            <form onSubmit={handleSubmit} className="space-y-5 text-left mt-6">
               <div>
-                <Label htmlFor="email">Email</Label>
-                <Input id="email" type="email" value={email} onChange={e => setEmail(e.target.value)} required />
+                <Label htmlFor="email" className="text-sm font-semibold text-foreground mb-1.5 block">Email</Label>
+                <Input id="email" type="email" value={email} onChange={e => setEmail(e.target.value)} required className="rounded-xl bg-surface-container-low border-0 focus:bg-surface-container-highest focus:ring-1 focus:ring-primary/20 h-12" />
               </div>
-              <Button type="submit" className="w-full" disabled={loading}>
+              <Button type="submit" className="w-full btn-gradient rounded-full h-12 text-base font-semibold" disabled={loading}>
                 {loading ? 'Sending...' : 'Send Reset Link'}
               </Button>
             </form>

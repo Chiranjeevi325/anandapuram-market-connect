@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import StarRating from '@/components/StarRating';
@@ -35,13 +35,13 @@ const ReviewForm = ({ orderId, sellerId, onSubmitted, onCancel }: ReviewFormProp
     }
 
     setSubmitting(true);
-    const { error } = await supabase.from('reviews' as any).insert({
+    const { error } = await supabase.from('reviews').insert({
       buyer_id: user.id,
       seller_id: sellerId,
       order_id: orderId,
       rating,
       comment: comment.trim() || null,
-    } as any);
+    });
 
     setSubmitting(false);
 

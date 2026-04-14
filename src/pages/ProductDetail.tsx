@@ -6,9 +6,8 @@ import PriceTicker from '@/components/PriceTicker';
 import Footer from '@/components/Footer';
 import { products as staticProducts } from '@/data/products';
 import { supabase } from '@/integrations/supabase/client';
-import { useCart } from '@/contexts/CartContext';
+import { useCart } from '@/hooks/useCart';
 import { useWishlist } from '@/hooks/useWishlist';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import StarRating from '@/components/StarRating';
 import { toast } from 'sonner';
@@ -55,7 +54,6 @@ const ProductDetailPage = () => {
       if (!productId) return;
       setLoading(true);
 
-      // Try DB first
       const { data: dbProduct } = await supabase
         .from('products')
         .select('*, profiles!products_seller_id_fkey(full_name, village, farm_name, phone)')
@@ -63,23 +61,21 @@ const ProductDetailPage = () => {
         .maybeSingle();
 
       if (dbProduct) {
-        // Fetch reviews for this seller
         const { data: reviewsData } = await supabase
           .from('reviews')
           .select('id, rating, comment, created_at, buyer_id')
-          .eq('seller_id', (dbProduct as any).seller_id)
+          .eq('seller_id', dbProduct.seller_id)
           .order('created_at', { ascending: false })
           .limit(10);
 
-        // Get buyer names
-        const buyerIds = reviewsData?.map((r: any) => r.buyer_id) || [];
+        const buyerIds = reviewsData?.map(r => r.buyer_id) || [];
         const { data: buyerProfiles } = buyerIds.length > 0
           ? await supabase.from('profiles').select('user_id, full_name').in('user_id', buyerIds)
           : { data: [] };
 
-        const buyerMap = new Map((buyerProfiles || []).map((p: any) => [p.user_id, p.full_name]));
+        const buyerMap = new Map((buyerProfiles || []).map(p => [p.user_id, p.full_name]));
 
-        setReviews((reviewsData || []).map((r: any) => ({
+        setReviews((reviewsData || []).map(r => ({
           id: r.id,
           rating: r.rating,
           comment: r.comment,
@@ -87,9 +83,10 @@ const ProductDetailPage = () => {
           buyer_name: buyerMap.get(r.buyer_id) || 'Anonymous',
         })));
 
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const p = dbProduct as any;
         const avgRating = reviewsData && reviewsData.length > 0
-          ? Math.round((reviewsData.reduce((sum: number, r: any) => sum + r.rating, 0) / reviewsData.length) * 10) / 10
+          ? Math.round((reviewsData.reduce((sum: number, r) => sum + r.rating, 0) / reviewsData.length) * 10) / 10
           : 0;
 
         setProduct({
@@ -110,7 +107,6 @@ const ProductDetailPage = () => {
           sellerId: p.seller_id,
         });
       } else {
-        // Fall back to static
         const sp = staticProducts.find(p => p.id === productId);
         if (sp) {
           setProduct({
@@ -153,14 +149,14 @@ const ProductDetailPage = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-background">
+      <div className="min-h-screen bg-surface">
         <PriceTicker />
         <Navbar />
-        <div className="container mx-auto px-4 py-20 text-center">
-          <div className="animate-pulse space-y-4 max-w-4xl mx-auto">
-            <div className="h-96 bg-muted rounded-xl" />
-            <div className="h-8 bg-muted rounded w-1/3" />
-            <div className="h-4 bg-muted rounded w-2/3" />
+        <div className="container mx-auto px-4 py-20">
+          <div className="animate-shimmer space-y-4 max-w-4xl mx-auto">
+            <div className="h-96 rounded-2xl bg-surface-container-low" />
+            <div className="h-8 rounded-xl bg-surface-container-low w-1/3" />
+            <div className="h-4 rounded-xl bg-surface-container-low w-2/3" />
           </div>
         </div>
       </div>
@@ -169,12 +165,12 @@ const ProductDetailPage = () => {
 
   if (!product) {
     return (
-      <div className="min-h-screen bg-background">
+      <div className="min-h-screen bg-surface">
         <PriceTicker />
         <Navbar />
         <div className="container mx-auto px-4 py-20 text-center">
           <h1 className="text-2xl font-display font-bold text-foreground mb-4">Product Not Found</h1>
-          <Link to="/products"><Button variant="outline" className="gap-2"><ArrowLeft className="h-4 w-4" /> Back to Products</Button></Link>
+          <Link to="/products"><Button className="gap-2 btn-gradient rounded-full px-8 font-semibold"><ArrowLeft className="h-4 w-4" /> Back to Products</Button></Link>
         </div>
         <Footer />
       </div>
@@ -182,26 +178,26 @@ const ProductDetailPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-surface">
       <PriceTicker />
       <Navbar />
 
       <div className="container mx-auto px-4 py-6">
         {/* Breadcrumb */}
-        <nav className="flex items-center gap-2 text-sm text-muted-foreground mb-6 animate-fade-in-up">
+        <nav className="flex items-center gap-2 text-sm text-muted-foreground mb-6 animate-fade-in-up font-body">
           <Link to="/" className="hover:text-primary transition-colors">Home</Link>
-          <span>/</span>
+          <span className="text-outline-variant">/</span>
           <Link to="/products" className="hover:text-primary transition-colors">Products</Link>
-          <span>/</span>
+          <span className="text-outline-variant">/</span>
           <Link to={`/products?cat=${product.category}`} className="hover:text-primary transition-colors capitalize">{product.category}</Link>
-          <span>/</span>
+          <span className="text-outline-variant">/</span>
           <span className="text-foreground font-medium">{product.name}</span>
         </nav>
 
         <div className="grid lg:grid-cols-2 gap-10 mb-16">
           {/* Image Gallery */}
           <div className="space-y-4 animate-fade-in-up">
-            <div className="relative aspect-square rounded-2xl overflow-hidden bg-muted shadow-[var(--shadow-elevated)] group">
+            <div className="relative aspect-square rounded-3xl overflow-hidden bg-surface-container-low shadow-elevated group">
               <img
                 src={allImages[selectedImage]}
                 alt={product.name}
@@ -211,13 +207,13 @@ const ProductDetailPage = () => {
                 <>
                   <button
                     onClick={prevImage}
-                    className="absolute left-3 top-1/2 -translate-y-1/2 h-10 w-10 rounded-full bg-card/80 backdrop-blur-sm flex items-center justify-center hover:bg-card transition-all opacity-0 group-hover:opacity-100"
+                    className="absolute left-3 top-1/2 -translate-y-1/2 h-10 w-10 rounded-full glass-card flex items-center justify-center hover:scale-110 transition-all opacity-0 group-hover:opacity-100"
                   >
                     <ChevronLeft className="h-5 w-5" />
                   </button>
                   <button
                     onClick={nextImage}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 h-10 w-10 rounded-full bg-card/80 backdrop-blur-sm flex items-center justify-center hover:bg-card transition-all opacity-0 group-hover:opacity-100"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 h-10 w-10 rounded-full glass-card flex items-center justify-center hover:scale-110 transition-all opacity-0 group-hover:opacity-100"
                   >
                     <ChevronRight className="h-5 w-5" />
                   </button>
@@ -225,13 +221,13 @@ const ProductDetailPage = () => {
               )}
               <button
                 onClick={() => toggleWishlist(product.id)}
-                className="absolute top-4 right-4 h-10 w-10 rounded-full bg-card/80 backdrop-blur-sm flex items-center justify-center hover:bg-card transition-all hover:scale-110"
+                className="absolute top-4 right-4 h-10 w-10 rounded-full glass-card flex items-center justify-center hover:scale-110 transition-all"
               >
                 <Heart className={`h-5 w-5 transition-colors duration-200 ${isWishlisted(product.id) ? 'fill-destructive text-destructive' : 'text-muted-foreground'}`} />
               </button>
               <div className="absolute top-4 left-4 flex gap-2">
                 {product.tags.map(tag => (
-                  <Badge key={tag} className="bg-secondary text-secondary-foreground text-xs font-semibold">{tag}</Badge>
+                  <span key={tag} className="freshness-badge">{tag}</span>
                 ))}
               </div>
             </div>
@@ -243,9 +239,8 @@ const ProductDetailPage = () => {
                   <button
                     key={i}
                     onClick={() => setSelectedImage(i)}
-                    className={`relative w-20 h-20 rounded-lg overflow-hidden transition-all duration-200 ${
-                      selectedImage === i ? 'ring-2 ring-primary ring-offset-2' : 'opacity-60 hover:opacity-100'
-                    }`}
+                    className={`relative w-20 h-20 rounded-xl overflow-hidden transition-all duration-200 ${selectedImage === i ? 'ring-2 ring-primary ring-offset-2' : 'opacity-60 hover:opacity-100'
+                      }`}
                   >
                     <img src={img} alt={`${product.name} ${i + 1}`} className="w-full h-full object-cover" />
                   </button>
@@ -257,7 +252,7 @@ const ProductDetailPage = () => {
           {/* Product Info */}
           <div className="space-y-6 animate-fade-in-up" style={{ animationDelay: '100ms', animationFillMode: 'both' }}>
             <div>
-              <p className="text-sm text-secondary font-medium uppercase tracking-wider mb-1">{product.nameLocal}</p>
+              <p className="text-sm text-secondary font-semibold uppercase tracking-wider mb-1">{product.nameLocal}</p>
               <h1 className="text-3xl sm:text-4xl font-display font-bold text-foreground mb-2">{product.name}</h1>
               <div className="flex items-center gap-3">
                 {product.rating > 0 && (
@@ -265,52 +260,49 @@ const ProductDetailPage = () => {
                     <StarRating value={product.rating} readonly size="sm" />
                     <span className="text-sm font-medium text-muted-foreground">{product.rating}</span>
                     {reviews.length > 0 && (
-                      <span className="text-sm text-muted-foreground">({reviews.length} reviews)</span>
+                      <span className="text-sm text-muted-foreground font-body">({reviews.length} reviews)</span>
                     )}
                   </div>
                 )}
-                <Badge variant={product.inStock ? 'default' : 'destructive'} className="text-xs">
+                <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold ${product.inStock ? 'bg-tertiary-fixed text-tertiary-fixed-fg' : 'bg-destructive text-destructive-foreground'}`}>
                   {product.inStock ? 'In Stock' : 'Out of Stock'}
-                </Badge>
+                </span>
               </div>
             </div>
 
             {/* Price Section */}
-            <div className="bg-card rounded-xl p-5 shadow-[var(--shadow-card)] space-y-4">
+            <div className="tonal-card p-5 space-y-4">
               <div className="flex gap-2">
-                <Button
-                  variant={priceType === 'wholesale' ? 'default' : 'outline'}
-                  size="sm"
+                <button
                   onClick={() => setPriceType('wholesale')}
+                  className={`px-4 py-2 rounded-full text-sm font-semibold transition-all duration-200 ${priceType === 'wholesale' ? 'bg-secondary-container text-secondary-container-fg shadow-card' : 'bg-surface-container-low text-muted-foreground hover:bg-surface-container-high'}`}
                 >
                   Wholesale
-                </Button>
-                <Button
-                  variant={priceType === 'retail' ? 'default' : 'outline'}
-                  size="sm"
+                </button>
+                <button
                   onClick={() => setPriceType('retail')}
+                  className={`px-4 py-2 rounded-full text-sm font-semibold transition-all duration-200 ${priceType === 'retail' ? 'bg-secondary-container text-secondary-container-fg shadow-card' : 'bg-surface-container-low text-muted-foreground hover:bg-surface-container-high'}`}
                 >
                   Retail
-                </Button>
+                </button>
               </div>
               <div>
                 <div className="flex items-baseline gap-2">
-                  <span className="text-3xl font-bold text-primary">
+                  <span className="text-3xl font-bold text-secondary">
                     ₹{priceType === 'wholesale' ? product.wholesalePrice.min : product.retailPrice.min}
                   </span>
                   <span className="text-lg text-muted-foreground">
                     – ₹{priceType === 'wholesale' ? product.wholesalePrice.max : product.retailPrice.max}
                   </span>
-                  <span className="text-sm text-muted-foreground">
+                  <span className="text-sm text-muted-foreground font-body">
                     / {priceType === 'wholesale' ? product.wholesalePrice.unit : product.retailPrice.unit}
                   </span>
                 </div>
-                <p className="text-xs text-muted-foreground mt-1">Prices vary based on season and availability</p>
+                <p className="text-xs text-muted-foreground mt-1 font-body">Prices vary based on season and availability</p>
               </div>
               <Button
                 size="lg"
-                className="w-full gap-2 text-base"
-                variant={addedToCart ? 'secondary' : 'default'}
+                className={`w-full gap-2 text-base rounded-full font-semibold transition-all duration-300 ${addedToCart ? 'bg-tertiary-fixed text-tertiary-fixed-fg' : 'btn-gradient'}`}
                 onClick={handleAddToCart}
               >
                 {addedToCart ? <><Check className="h-5 w-5" /> Added to Cart</> : <><ShoppingCart className="h-5 w-5" /> Add to Cart</>}
@@ -320,14 +312,14 @@ const ProductDetailPage = () => {
             {/* Description */}
             <div>
               <h2 className="text-lg font-display font-bold text-foreground mb-2">About this product</h2>
-              <p className="text-muted-foreground leading-relaxed">{product.description}</p>
+              <p className="text-muted-foreground leading-relaxed font-body">{product.description}</p>
             </div>
 
             {/* Seller Info */}
-            <div className="bg-card rounded-xl p-5 shadow-[var(--shadow-card)]">
+            <div className="tonal-card p-5">
               <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-3">Seller Information</h3>
               <div className="flex items-start gap-4">
-                <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                <div className="h-12 w-12 rounded-2xl bg-surface-container-low flex items-center justify-center flex-shrink-0">
                   <User className="h-6 w-6 text-primary" />
                 </div>
                 <div className="flex-1">
@@ -340,13 +332,13 @@ const ProductDetailPage = () => {
                       <span className="font-display font-bold text-foreground">{product.vendor}</span>
                     )}
                   </div>
-                  <div className="flex items-center gap-1 text-sm text-muted-foreground mt-0.5">
+                  <div className="flex items-center gap-1 text-sm text-muted-foreground mt-0.5 font-body">
                     <MapPin className="h-3.5 w-3.5" />
                     {product.vendorLocation}
                   </div>
                   {product.sellerId !== 'static-seller' && (
                     <Link to={`/seller/${product.sellerId}`}>
-                      <Button variant="outline" size="sm" className="mt-3">View Seller Profile</Button>
+                      <Button variant="ghost" size="sm" className="mt-3 rounded-xl hover:bg-surface-container-high font-body">View Seller Profile</Button>
                     </Link>
                   )}
                 </div>
@@ -361,21 +353,21 @@ const ProductDetailPage = () => {
             <h2 className="text-2xl font-display font-bold text-foreground mb-6">Customer Reviews</h2>
             <div className="space-y-4">
               {reviews.map(review => (
-                <div key={review.id} className="bg-card rounded-xl p-5 shadow-[var(--shadow-card)]">
+                <div key={review.id} className="tonal-card p-5">
                   <div className="flex items-center justify-between mb-2">
                     <div className="flex items-center gap-2">
-                      <div className="h-8 w-8 rounded-full bg-muted flex items-center justify-center">
+                      <div className="h-8 w-8 rounded-full bg-surface-container-high flex items-center justify-center">
                         <User className="h-4 w-4 text-muted-foreground" />
                       </div>
                       <span className="font-medium text-foreground text-sm">{review.buyer_name}</span>
                     </div>
-                    <span className="text-xs text-muted-foreground">
+                    <span className="text-xs text-muted-foreground font-body">
                       {new Date(review.created_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
                     </span>
                   </div>
                   <StarRating value={review.rating} readonly size="sm" />
                   {review.comment && (
-                    <p className="text-sm text-muted-foreground mt-2">{review.comment}</p>
+                    <p className="text-sm text-muted-foreground mt-2 font-body">{review.comment}</p>
                   )}
                 </div>
               ))}
