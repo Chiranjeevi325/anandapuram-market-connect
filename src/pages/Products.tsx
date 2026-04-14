@@ -52,10 +52,6 @@ const Products = () => {
 
       if (!productsData) return;
 
-<<<<<<< HEAD
-      // Fetch all reviews to compute avg ratings per seller
-      const sellerIds = [...new Set(productsData.map(p => p.seller_id))];
-=======
       // Fetch seller profiles
       const sellerIds = [...new Set(productsData.map((p: any) => p.seller_id))];
       const { data: profilesData } = await supabase
@@ -67,7 +63,6 @@ const Products = () => {
       profilesData?.forEach((pr: any) => profileMap.set(pr.user_id, pr));
 
       // Fetch all reviews to compute avg ratings per seller
->>>>>>> fe8f8203f5d49837a089841cc05f9e65463ac356
       const { data: reviewsData } = await supabase
         .from('reviews')
         .select('seller_id, rating')
@@ -226,11 +221,7 @@ const Products = () => {
                 className="tonal-card overflow-hidden transition-all duration-500 group animate-fade-in-up"
                 style={{ animationDelay: `${Math.min(i, 7) * 60}ms`, animationFillMode: 'both' }}
               >
-<<<<<<< HEAD
-                <Link to={`/product/${product.id}`} className="relative aspect-[4/5] overflow-hidden block">
-                  <img src={product.image} alt={product.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy" />
-=======
-                <Link to={`/product/${product.id}`} className="relative aspect-square overflow-hidden block bg-muted">
+                <Link to={`/product/${product.id}`} className="relative aspect-[4/5] overflow-hidden block bg-muted">
                   <img
                     src={product.image}
                     alt={product.name}
@@ -238,7 +229,6 @@ const Products = () => {
                     loading="lazy"
                     onError={(e) => { (e.target as HTMLImageElement).src = '/placeholder.svg'; }}
                   />
->>>>>>> fe8f8203f5d49837a089841cc05f9e65463ac356
                   <div className="absolute top-3 left-3 flex gap-1.5">
                     {product.tags.map(tag => (
                       <span key={tag} className="freshness-badge text-[10px]">{tag}</span>

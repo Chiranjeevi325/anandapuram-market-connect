@@ -68,7 +68,7 @@ const Cart = () => {
               const isDemo = isStaticProduct(item.productId) || item.sellerId === 'static-seller';
               return (
                 <div key={item.productId} className={`tonal-card p-4 flex gap-4 ${isDemo ? 'opacity-60' : ''}`}>
-                  <img src={item.image} alt={item.name} className="w-20 h-20 rounded-xl object-cover flex-shrink-0" />
+                  <img src={item.image} alt={item.name} className="w-20 h-20 rounded-xl object-cover flex-shrink-0 bg-surface-container-high" onError={(e) => { (e.target as HTMLImageElement).src = '/placeholder.svg'; }} />
                   <div className="flex-1 min-w-0">
                     <div className="flex items-start justify-between gap-2">
                       <div>
@@ -118,7 +118,7 @@ const Cart = () => {
                   </div>
                 );
               })}
-              <div className="h-px bg-outline-variant/20 my-2" />
+              <div className="h-px bg-outline-variant/15 my-2" />
               {hasStaticItems && (
                 <div className="flex justify-between text-sm text-muted-foreground">
                   <span className="font-body">Orderable total</span>

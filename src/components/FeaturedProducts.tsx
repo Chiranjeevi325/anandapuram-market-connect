@@ -118,18 +118,13 @@ const FeaturedProducts = () => {
                 className={`tonal-card overflow-hidden transition-all duration-500 group ${gridVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'}`}
                 style={{ transitionDelay: gridVisible ? `${i * 100}ms` : '0ms' }}
               >
-<<<<<<< HEAD
-                <Link to={`/product/${product.id}`} className="relative aspect-[4/5] overflow-hidden block">
-                  <img src={product.image} alt={product.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
-=======
-                <Link to={`/product/${product.id}`} className="relative aspect-square overflow-hidden block bg-muted">
+                <Link to={`/product/${product.id}`} className="relative aspect-[4/5] overflow-hidden block bg-muted">
                   <img
                     src={product.image}
                     alt={product.name}
                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
                     onError={(e) => { (e.target as HTMLImageElement).src = '/placeholder.svg'; }}
                   />
->>>>>>> fe8f8203f5d49837a089841cc05f9e65463ac356
                   <div className="absolute top-3 left-3 flex gap-1.5">
                     {product.tags.map(tag => (
                       <span key={tag} className="freshness-badge text-[10px]">{tag}</span>

@@ -95,10 +95,10 @@ const Auth = () => {
           </Link>
         </div>
 
-        <div className="flex-1 flex items-center justify-center px-4 pb-16">
-          <div className="w-full max-w-md">
+        <div className="flex-1 flex items-center justify-center px-4 pb-16 pt-8">
+          <div className="w-full max-w-md tonal-card p-6 sm:p-10">
             <div className="text-center mb-10">
-              <div className="h-14 w-14 rounded-2xl bg-primary flex items-center justify-center mx-auto mb-4">
+              <div className="h-14 w-14 rounded-2xl bg-primary flex items-center justify-center mx-auto mb-4 shadow-elevated">
                 <Flower2 className="h-7 w-7 text-primary-foreground" />
               </div>
               <h1 className="text-2xl font-display font-bold text-foreground">
@@ -110,74 +110,78 @@ const Auth = () => {
             </div>
 
             {isSignUp && (
-              <div className="flex gap-3 mb-8">
+              <div className="flex gap-2 mb-8 bg-surface-container-low p-1.5 rounded-2xl border border-outline-variant/15">
                 {(['buyer', 'seller'] as Role[]).map((r) => (
                   <button
                     key={r}
                     onClick={() => setRole(r)}
-                    className={`flex-1 py-3.5 px-4 rounded-2xl text-center font-semibold capitalize transition-all duration-200 ${role === r
-                        ? 'bg-secondary-container text-secondary-container-fg shadow-card'
-                        : 'bg-surface-container-low text-muted-foreground hover:bg-surface-container-high'
+                    className={`flex-1 py-3 px-3 rounded-xl text-center font-semibold capitalize transition-all duration-300 ${role === r
+                        ? 'bg-secondary-container text-secondary-container-fg shadow-card scale-100'
+                        : 'bg-transparent text-muted-foreground hover:bg-surface-container-high hover:text-foreground'
                       }`}
                   >
                     {r === 'buyer' ? '🛒 Buyer' : '🌾 Seller'}
-                    <span className="block text-xs font-normal mt-0.5 opacity-70">
-                      {r === 'buyer' ? 'Buy flowers & produce' : 'Sell your farm goods'}
+                    <span className={`block text-[10px] font-normal mt-0.5 ${role === r ? 'opacity-80' : 'opacity-60'}`}>
+                      {r === 'buyer' ? 'Buy flowers' : 'Sell goods'}
                     </span>
                   </button>
                 ))}
               </div>
             )}
 
-            <form onSubmit={handleSubmit} className="space-y-5">
+            <form onSubmit={handleSubmit} className="space-y-4">
               {isSignUp && (
                 <div>
-                  <Label htmlFor="fullName" className="text-sm font-semibold text-foreground mb-1.5 block">Full Name</Label>
-                  <Input id="fullName" value={fullName} onChange={e => setFullName(e.target.value)} required className="rounded-xl bg-surface-container-low border-0 focus:bg-surface-container-highest focus:ring-1 focus:ring-primary/20 h-12" />
+                  <Label htmlFor="fullName" className="text-sm font-semibold text-foreground mb-1 block">Full Name</Label>
+                  <Input id="fullName" value={fullName} onChange={e => setFullName(e.target.value)} required className="rounded-xl bg-surface-container-low border border-outline-variant/15 focus:bg-surface-container-highest focus:ring-1 focus:ring-primary/20 h-12 transition-all" />
                 </div>
               )}
 
               <div>
-                <Label htmlFor="email" className="text-sm font-semibold text-foreground mb-1.5 block">Email</Label>
-                <Input id="email" type="email" value={email} onChange={e => setEmail(e.target.value)} required className="rounded-xl bg-surface-container-low border-0 focus:bg-surface-container-highest focus:ring-1 focus:ring-primary/20 h-12" />
+                <Label htmlFor="email" className="text-sm font-semibold text-foreground mb-1 block">Email</Label>
+                <Input id="email" type="email" value={email} onChange={e => setEmail(e.target.value)} required className="rounded-xl bg-surface-container-low border border-outline-variant/15 focus:bg-surface-container-highest focus:ring-1 focus:ring-primary/20 h-12 transition-all" />
               </div>
 
               <div>
-                <Label htmlFor="password" className="text-sm font-semibold text-foreground mb-1.5 block">Password</Label>
-                <Input id="password" type="password" value={password} onChange={e => setPassword(e.target.value)} required minLength={6} className="rounded-xl bg-surface-container-low border-0 focus:bg-surface-container-highest focus:ring-1 focus:ring-primary/20 h-12" />
+                <Label htmlFor="password" className="text-sm font-semibold text-foreground mb-1 block">Password</Label>
+                <Input id="password" type="password" value={password} onChange={e => setPassword(e.target.value)} required minLength={6} className="rounded-xl bg-surface-container-low border border-outline-variant/15 focus:bg-surface-container-highest focus:ring-1 focus:ring-primary/20 h-12 transition-all" />
               </div>
 
               {isSignUp && (
                 <div>
-                  <Label htmlFor="phone" className="text-sm font-semibold text-foreground mb-1.5 block">Phone Number</Label>
-                  <Input id="phone" type="tel" value={phone} onChange={e => setPhone(e.target.value)} placeholder="+91 XXXXX XXXXX" className="rounded-xl bg-surface-container-low border-0 focus:bg-surface-container-highest focus:ring-1 focus:ring-primary/20 h-12" />
+                  <Label htmlFor="phone" className="text-sm font-semibold text-foreground mb-1 block">Phone Number</Label>
+                  <Input id="phone" type="tel" value={phone} onChange={e => setPhone(e.target.value)} placeholder="+91 XXXXX XXXXX" className="rounded-xl bg-surface-container-low border border-outline-variant/15 focus:bg-surface-container-highest focus:ring-1 focus:ring-primary/20 h-12 transition-all" />
                 </div>
               )}
 
               {isSignUp && role === 'seller' && (
                 <>
                   <div>
-                    <Label htmlFor="farmName" className="text-sm font-semibold text-foreground mb-1.5 block">Farm / Vendor Name</Label>
-                    <Input id="farmName" value={farmName} onChange={e => setFarmName(e.target.value)} placeholder="e.g., Ramesh Farm" required className="rounded-xl bg-surface-container-low border-0 focus:bg-surface-container-highest focus:ring-1 focus:ring-primary/20 h-12" />
+                    <Label htmlFor="farmName" className="text-sm font-semibold text-foreground mb-1 block">Farm / Vendor Name</Label>
+                    <Input id="farmName" value={farmName} onChange={e => setFarmName(e.target.value)} placeholder="e.g., Ramesh Farm" required className="rounded-xl bg-surface-container-low border border-outline-variant/15 focus:bg-surface-container-highest focus:ring-1 focus:ring-primary/20 h-12 transition-all" />
                   </div>
-                  <div>
-                    <Label htmlFor="village" className="text-sm font-semibold text-foreground mb-1.5 block">Location / Village</Label>
-                    <Input id="village" value={village} onChange={e => setVillage(e.target.value)} placeholder="e.g., Gambhiram, Turlavada" required className="rounded-xl bg-surface-container-low border-0 focus:bg-surface-container-highest focus:ring-1 focus:ring-primary/20 h-12" />
-                  </div>
-                  <div>
-                    <Label htmlFor="primaryProduct" className="text-sm font-semibold text-foreground mb-1.5 block">Primary Product</Label>
-                    <Input id="primaryProduct" value={primaryProduct} onChange={e => setPrimaryProduct(e.target.value)} placeholder="e.g., Marigold, Jasmine" className="rounded-xl bg-surface-container-low border-0 focus:bg-surface-container-highest focus:ring-1 focus:ring-primary/20 h-12" />
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <Label htmlFor="village" className="text-sm font-semibold text-foreground mb-1 block">Location / Village</Label>
+                      <Input id="village" value={village} onChange={e => setVillage(e.target.value)} placeholder="e.g., Gambhiram" required className="rounded-xl bg-surface-container-low border border-outline-variant/15 focus:bg-surface-container-highest focus:ring-1 focus:ring-primary/20 h-12 transition-all" />
+                    </div>
+                    <div>
+                      <Label htmlFor="primaryProduct" className="text-sm font-semibold text-foreground mb-1 block">Primary Product</Label>
+                      <Input id="primaryProduct" value={primaryProduct} onChange={e => setPrimaryProduct(e.target.value)} placeholder="e.g., Marigold" className="rounded-xl bg-surface-container-low border border-outline-variant/15 focus:bg-surface-container-highest focus:ring-1 focus:ring-primary/20 h-12 transition-all" />
+                    </div>
                   </div>
                 </>
               )}
 
-              <Button type="submit" className="w-full btn-gradient rounded-full h-12 text-base font-semibold" size="lg" disabled={loading}>
-                {loading ? 'Please wait...' : isSignUp ? 'Create Account' : 'Sign In'}
-              </Button>
+              <div className="pt-2">
+                <Button type="submit" className="w-full btn-gradient rounded-full h-12 text-base font-semibold" size="lg" disabled={loading}>
+                  {loading ? 'Please wait...' : isSignUp ? 'Create Account' : 'Sign In'}
+                </Button>
+              </div>
             </form>
 
             {!isSignUp && (
-              <div className="text-center mt-4">
+              <div className="text-center mt-6">
                 <Link to="/forgot-password" className="text-sm text-primary font-medium hover:underline">Forgot password?</Link>
               </div>
             )}

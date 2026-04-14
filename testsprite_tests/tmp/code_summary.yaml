@@ -1,0 +1,131 @@
+version: "2"
+type: frontend
+tech_stack:
+  - TypeScript
+  - React (Vite)
+  - Tailwind CSS
+  - Supabase
+  - React Router
+  - TanStack Query
+  - Lucide React
+  - Sonner
+routes:
+  - path: /
+    file: src/pages/Index.tsx
+    auth_required: false
+    description: Homepage with featured products and categories
+  - path: /products
+    file: src/pages/Products.tsx
+    auth_required: false
+    description: Product catalog browsing page
+  - path: /product/:productId
+    file: src/pages/ProductDetail.tsx
+    auth_required: false
+    description: Individual product details and review page
+  - path: /auth
+    file: src/pages/Auth.tsx
+    auth_required: false
+    description: Unified login and registration page
+  - path: /forgot-password
+    file: src/pages/ForgotPassword.tsx
+    auth_required: false
+    description: Password recovery request page
+  - path: /reset-password
+    file: src/pages/ResetPassword.tsx
+    auth_required: false
+    description: Secure password reset page
+  - path: /seller
+    file: src/pages/SellerDashboard.tsx
+    auth_required: true
+    description: Dashboard for market vendors/sellers
+  - path: /admin
+    file: src/pages/AdminDashboard.tsx
+    auth_required: true
+    description: System administrator control panel
+  - path: /cart
+    file: src/pages/Cart.tsx
+    auth_required: false
+    description: Shopping cart overview and summary
+  - path: /checkout
+    file: src/pages/Checkout.tsx
+    auth_required: true
+    description: Final multi-step checkout and payment process
+  - path: /orders
+    file: src/pages/Orders.tsx
+    auth_required: true
+    description: User order history and status tracking
+  - path: /wishlist
+    file: src/pages/Wishlist.tsx
+    auth_required: true
+    description: User's saved/favorite products list
+features:
+  - name: User Authentication
+    description: Comprehensive auth system with role-based profiles (Buyer/Seller)
+    files:
+      - src/pages/Auth.tsx
+      - src/hooks/useAuth.ts
+      - src/contexts/AuthContext.tsx
+    entry_route: /auth
+    user_interactions:
+      - Toggle between Login and Sign Up modes
+      - Select user role (Buyer/Seller) during registration
+      - Fill email, password, and profile details
+      - Click 'Sign In' or 'Create Account' button
+    api_calls:
+      - method: Auth
+        endpoint: supabase.auth.signUp
+      - method: Auth
+        endpoint: supabase.auth.signInWithPassword
+    auth_required: false
+  - name: Product Catalog
+    description: Dynamic product listing with category filtering and search
+    files:
+      - src/pages/Products.tsx
+      - src/components/FeaturedProducts.tsx
+      - src/components/CategoryShowcase.tsx
+    entry_route: /products
+    user_interactions:
+      - Filter products by category (Flowers, Vegetables)
+      - Search for specific items
+      - View price ranges and stock status
+    api_calls:
+      - method: GET
+        endpoint: supabase.from('products').select('*')
+    auth_required: false
+  - name: Cart & Checkout
+    description: Full shopping lifecycle from adding to cart to finalizing orders
+    files:
+      - src/pages/Cart.tsx
+      - src/pages/Checkout.tsx
+      - src/contexts/CartContext.tsx
+    entry_route: /cart
+    user_interactions:
+      - Add/Remove products to cart
+      - Adjust item quantities
+      - Select delivery type (Self Pickup / Delivery)
+      - Confirm order details
+    api_calls:
+      - method: POST
+        endpoint: supabase.from('orders').insert(...)
+    auth_required: true
+  - name: Marketplace Management
+    description: Seller and Admin panels for controlling the marketplace state
+    files:
+      - src/pages/SellerDashboard.tsx
+      - src/pages/AdminDashboard.tsx
+    entry_route: /admin
+    user_interactions:
+      - Add new products as a seller
+      - Deactivate products as an admin
+      - Update order statuses
+    api_calls:
+      - method: PATCH
+        endpoint: supabase.from('products').update(...)
+    auth_required: true
+known_limitations:
+  - issue: Local Port Mapping 8080
+    location: vite.config.ts
+    impact: Default dev server runs on 8080 instead of standard 5173
+  - issue: Static/Demo Items
+    location: src/pages/Products.tsx
+    impact: Some products are 'static' for demo purposes and cannot be ordered through normal flow

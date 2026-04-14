@@ -150,8 +150,8 @@ const Wishlist = () => {
                   className="tonal-card overflow-hidden group animate-fade-in-up"
                   style={{ animationDelay: `${Math.min(i, 7) * 60}ms`, animationFillMode: 'both' }}
                 >
-                  <Link to={`/product/${product.id}`} className="relative aspect-[4/5] overflow-hidden block">
-                    <img src={product.image} alt={product.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy" />
+                  <Link to={`/product/${product.id}`} className="relative aspect-[4/5] overflow-hidden block bg-muted">
+                    <img src={product.image} alt={product.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy" onError={(e) => { (e.target as HTMLImageElement).src = '/placeholder.svg'; }} />
                     <div className="absolute top-3 left-3 flex gap-1.5">
                       {product.tags.map(tag => (
                         <span key={tag} className="freshness-badge text-[10px]">{tag}</span>

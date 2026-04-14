@@ -241,7 +241,7 @@ const Orders = () => {
                     {order.order_items.map(item => (
                       <div key={item.id} className="flex items-center gap-3">
                         {item.products?.image_url ? (
-                          <img src={item.products.image_url} alt={item.products?.name} className="w-10 h-10 rounded-xl object-cover" />
+                          <img src={item.products.image_url} alt={item.products?.name} className="w-10 h-10 rounded-xl object-cover bg-surface-container-high" onError={(e) => { (e.target as HTMLImageElement).src = '/placeholder.svg'; }} />
                         ) : (
                           <div className="w-10 h-10 rounded-xl bg-surface-container-high flex items-center justify-center">
                             <Package className="h-4 w-4 text-muted-foreground" />
