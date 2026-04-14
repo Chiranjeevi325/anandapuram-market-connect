@@ -51,6 +51,7 @@ const CategoryShowcase = () => {
               className={`group relative overflow-hidden rounded-3xl aspect-[4/3] shadow-card hover:shadow-elevated transition-all duration-500 ${gridVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'}`}
               style={{ transitionDelay: gridVisible ? `${i * 150}ms` : '0ms' }}
             >
+<<<<<<< HEAD
               <img src={cat.image} alt={cat.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" loading="lazy" />
               <div className="absolute inset-0 bg-gradient-to-t from-[#0F2113]/85 via-[#0F2113]/30 to-transparent" />
               <div className="absolute bottom-0 left-0 right-0 p-8">
@@ -58,6 +59,15 @@ const CategoryShowcase = () => {
                 <h3 className="text-3xl font-display font-bold text-white mb-1.5">{cat.title}</h3>
                 <p className="text-sm text-white/65 mb-4 font-body">{cat.description}</p>
                 <div className="flex items-center gap-2 text-secondary-container text-sm font-semibold group-hover:gap-3 transition-all duration-300">
+=======
+              <img src={cat.image} alt={cat.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" loading="lazy" onError={(e) => { (e.target as HTMLImageElement).src = '/placeholder.svg'; }} />
+              <div className="absolute inset-0 bg-gradient-to-t from-foreground/80 via-foreground/30 to-transparent" />
+              <div className="absolute bottom-0 left-0 right-0 p-6">
+                <span className="text-xs text-secondary font-medium uppercase tracking-wider">{cat.titleLocal}</span>
+                <h3 className="text-2xl font-display font-bold text-primary-foreground mb-1">{cat.title}</h3>
+                <p className="text-sm text-primary-foreground/70 mb-3">{cat.description}</p>
+                <div className="flex items-center gap-2 text-secondary text-sm font-semibold group-hover:gap-3 transition-all duration-300">
+>>>>>>> fe8f8203f5d49837a089841cc05f9e65463ac356
                   Browse {cat.count} items <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform duration-300" />
                 </div>
               </div>

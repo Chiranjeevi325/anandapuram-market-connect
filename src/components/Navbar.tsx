@@ -72,8 +72,16 @@ const Navbar = () => {
                 {profile?.role === 'seller' && (
                   <Link to="/seller"><Button variant="ghost" size="sm" className="bg-surface-container-low hover:bg-surface-container-high rounded-xl font-semibold">Dashboard</Button></Link>
                 )}
+<<<<<<< HEAD
                 <span className="text-sm text-muted-foreground font-medium">{profile?.full_name || user.email}</span>
                 <Button variant="ghost" size="icon" onClick={signOut} className="hover:bg-surface-container-high rounded-xl"><LogOut className="h-5 w-5" /></Button>
+=======
+                {profile?.role === 'admin' && (
+                  <Link to="/admin"><Button variant="outline" size="sm" className="gap-1.5 border-destructive/30 text-destructive hover:bg-destructive/10">🛡️ Admin</Button></Link>
+                )}
+                <span className="text-sm text-muted-foreground">{profile?.full_name || user.email}</span>
+                <Button variant="ghost" size="icon" onClick={signOut}><LogOut className="h-5 w-5" /></Button>
+>>>>>>> fe8f8203f5d49837a089841cc05f9e65463ac356
               </>
             ) : (
               <Link to="/auth">
@@ -130,7 +138,16 @@ const Navbar = () => {
                       <Button variant="ghost" size="sm" className="w-full bg-surface-container-high rounded-xl">Seller Dashboard</Button>
                     </Link>
                   )}
+<<<<<<< HEAD
                   <Button variant="ghost" size="sm" className="w-full rounded-xl" onClick={() => { signOut(); setIsOpen(false); }}>Sign Out</Button>
+=======
+                  {profile?.role === 'admin' && (
+                    <Link to="/admin" onClick={() => setIsOpen(false)}>
+                      <Button variant="outline" size="sm" className="w-full gap-1.5 border-destructive/30 text-destructive">🛡️ Admin Panel</Button>
+                    </Link>
+                  )}
+                  <Button variant="ghost" size="sm" className="w-full" onClick={() => { signOut(); setIsOpen(false); }}>Sign Out</Button>
+>>>>>>> fe8f8203f5d49837a089841cc05f9e65463ac356
                 </div>
               ) : (
                 <Link to="/auth" onClick={() => setIsOpen(false)}>

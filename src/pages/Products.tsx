@@ -47,13 +47,27 @@ const Products = () => {
     const load = async () => {
       const { data: productsData } = await supabase
         .from('products')
-        .select('*, profiles!products_seller_id_fkey(full_name, village)')
+        .select('*')
         .eq('is_active', true);
 
       if (!productsData) return;
 
+<<<<<<< HEAD
       // Fetch all reviews to compute avg ratings per seller
       const sellerIds = [...new Set(productsData.map(p => p.seller_id))];
+=======
+      // Fetch seller profiles
+      const sellerIds = [...new Set(productsData.map((p: any) => p.seller_id))];
+      const { data: profilesData } = await supabase
+        .from('profiles')
+        .select('user_id, full_name, village')
+        .in('user_id', sellerIds);
+
+      const profileMap = new Map<string, { full_name: string; village: string | null }>();
+      profilesData?.forEach((pr: any) => profileMap.set(pr.user_id, pr));
+
+      // Fetch all reviews to compute avg ratings per seller
+>>>>>>> fe8f8203f5d49837a089841cc05f9e65463ac356
       const { data: reviewsData } = await supabase
         .from('reviews')
         .select('seller_id, rating')
@@ -71,6 +85,7 @@ const Products = () => {
       setDbProducts((productsData as any[]).map(p => {
         const entry = ratingMap.get(p.seller_id);
         const avg = entry ? entry.sum / entry.count : 0;
+        const sellerProfile = profileMap.get(p.seller_id);
         return {
           id: p.id,
           name: p.name,
@@ -79,8 +94,8 @@ const Products = () => {
           image: p.image_url || 'https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?w=400&h=400&fit=crop',
           wholesalePrice: { min: p.wholesale_price_min, max: p.wholesale_price_max, unit: p.wholesale_unit },
           retailPrice: { min: p.retail_price_min, max: p.retail_price_max, unit: p.retail_unit },
-          vendor: p.profiles?.full_name || 'Local Vendor',
-          vendorLocation: p.profiles?.village || 'Anandapuram',
+          vendor: sellerProfile?.full_name || 'Local Vendor',
+          vendorLocation: sellerProfile?.village || 'Anandapuram',
           rating: Math.round(avg * 10) / 10,
           tags: p.tags || [],
           inStock: true,
@@ -211,8 +226,19 @@ const Products = () => {
                 className="tonal-card overflow-hidden transition-all duration-500 group animate-fade-in-up"
                 style={{ animationDelay: `${Math.min(i, 7) * 60}ms`, animationFillMode: 'both' }}
               >
+<<<<<<< HEAD
                 <Link to={`/product/${product.id}`} className="relative aspect-[4/5] overflow-hidden block">
                   <img src={product.image} alt={product.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy" />
+=======
+                <Link to={`/product/${product.id}`} className="relative aspect-square overflow-hidden block bg-muted">
+                  <img
+                    src={product.image}
+                    alt={product.name}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    loading="lazy"
+                    onError={(e) => { (e.target as HTMLImageElement).src = '/placeholder.svg'; }}
+                  />
+>>>>>>> fe8f8203f5d49837a089841cc05f9e65463ac356
                   <div className="absolute top-3 left-3 flex gap-1.5">
                     {product.tags.map(tag => (
                       <span key={tag} className="freshness-badge text-[10px]">{tag}</span>
